@@ -1,8 +1,12 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Agenda Hábita</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Hábita - Reservá tu turno</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Hábita - Cuerpo, energía y alma. Masajes, drenaje linfático, tratamiento estético y Reiki en Lagomar Sur.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500;600&display=swap">
-<style id="st">
+<style>
 /* Una sola columna pensada para el celular: cabecera con el loto, reglas, tres pasos (servicio, día y hora, datos). Panel privado para la dueña. */
 :root{
   --bg:#EFE5D8; --surface:#F8F2E9; --soft:#E7DACA; --ink:#43342C; --muted:#75624F; --line:#D8C8B5;
@@ -125,15 +129,12 @@ details.cancel .in{display:flex;flex-direction:column;gap:12px;padding:4px 0 16p
 #toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
+</head>
+<body>
 <div id="app"></div>
-<script type="application/json" id="pub">{"taken":[{"d":"2026-11-16","t":"08:30","u":60},{"d":"2026-11-18","t":"12:00","u":60}],"blocks":[],"updated":"2026-11-15T12:50:12.841Z"}</script>
-<script id="code">
+<script>
 (function(){
 'use strict';
-/* Datos del negocio: WhatsApp en formato internacional sin +, y precio de la sesión suelta. */
-const CFG={WA:'59894757659'};
-const HEAD='<title>Agenda Hábita</title><meta name="claude:viewport-fit-sides" content="cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500;600&display=swap">';
-const RESET=':root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}';
 const SERVICES=[
   {id:'desc',name:'Masaje descontracturante',dur:60,price:1000,desc:'Masaje profundo que busca aliviar las dolencias de las contracturas. Incluye espalda, hombros, cuello, manos, piernas y pies, además de terapia de ventosas y piedras calientes.'},
   {id:'rel',name:'Masaje relajante',dur:60,price:1000,desc:'Masaje más superficial que busca relajarte e inducirte a un estado de paz y calma. Se trabaja en espalda, hombros, cuello, manos, piernas y pies. Incluye piedras calientes.'},
@@ -149,7 +150,6 @@ const PACKS=[
   {id:'p4e',label:'4 sesiones de masaje para embarazadas',total:4,price:5000,only:'emb'}
 ];
 const IG='https://www.instagram.com/habita_terapias';
-const BANK={name:'Midinero',acct:'1346663',holder:'Maria Mercedes Souto Pensotti'};
 const money=n=>'$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const durTxt=m=>m===60?'1 hora':m===90?'1 hora 30':m+' min';
 const svcOf=id=>SERVICES.find(s=>s.id===id)||{dur:60,price:1000,name:''};
@@ -157,7 +157,7 @@ const dur=id=>svcOf(id).dur;
 const curDur=()=>S.svc?dur(S.svc):60;
 const DAYS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const MONTHS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const STATUS={pend:'Seña pendiente',conf:'Confirmado',done:'Realizado',canc:'Cancelado',cobr:'Cancelado, se cobra'};
+
 const $=s=>document.querySelector(s);
 const app=$('#app');
 const pad=n=>String(n).padStart(2,'0');
@@ -169,121 +169,82 @@ const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtDay=s=>{const d=parseD(s);return DAYS[d.getDay()]+' '+d.getDate()+'/'+pad(d.getMonth()+1)};
 const svcName=id=>(SERVICES.find(s=>s.id===id)||{name:''}).name;
-const cmp=(a,b)=>(a.d+a.t).localeCompare(b.d+b.t)||(a.created||0)-(b.created||0);
 const TIMES=[];for(let m=8*60;m<=20*60;m+=30)TIMES.push(hhmm(m));
+const TIMES_X=[];for(let m=7*60;m<=22*60;m+=30)TIMES_X.push(hhmm(m));
 const wa=(num,text)=>'https://wa.me/'+(num||'')+'?text='+encodeURIComponent(text);
 function waPhone(p){const d=String(p||'').replace(/\D/g,'');if(!d)return '';if(d.indexOf('598')===0)return d;if(d[0]==='0')return '598'+d.slice(1);return '598'+d}
 const first=n=>String(n||'').trim().split(/\s+/)[0];
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-const pkey=(name,phone)=>waPhone(phone)||('n:'+norm(name).trim());
 
-const PUB=JSON.parse($('#pub').textContent);
+
+const lotus=()=>'<svg viewBox="350 170 480 365" role="img" aria-label="Flor de loto de Hábita"><path fill="#C193B9" d="M438 296C490 305 520 322 545 345L548 455C480 440 440 380 438 296Z"/><path fill="#C193B9" d="M742 296C690 305 660 322 635 345L632 455C700 440 740 380 742 296Z"/><path fill="#C27F6C" d="M355 396C420 385 500 392 548 450C565 470 580 495 590 518C510 535 400 520 355 396Z"/><path fill="#C27F6C" d="M825 396C760 385 680 392 632 450C615 470 600 495 590 518C670 535 780 520 825 396Z"/><path fill="#AE6A43" d="M590 250C560 285 535 335 535 385C535 440 560 485 590 518C620 485 645 440 645 385C645 335 620 285 590 250Z"/><circle cx="590" cy="212" r="37" fill="#AE6A43"/></svg>';
+
+const WA='59894757659';
 const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
-const S={view:'client',tab:'hoy',owner:false,db:null,
-  svc:null,day:null,time:null,month:new Date(today0().getFullYear(),today0().getMonth(),1),
-  form:{name:'',phone:'',kind:'suelta',note:'',weeks:'',first:'',health:''},sent:false,cancelOpen:false,
-  cancel:{name:'',d:'',t:'10:00'},
-  bookings:[],blocks:[],cups:[],wait:[],clients:[],cl:{id:'',key:'',name:'',phone:'',note:'',q:''},mv:{id:'',d:'',t:'10:00'},sm:ymd(new Date()).slice(0,7),ready:{bookings:false,blocks:false,cups:false,wait:false},cancelId:null,
-  wl:{name:'',phone:'',pref:'any'},wlOpen:false,wlTime:null,nw:{name:'',phone:'',svc:'desc',d:ymd(new Date()),t:'',pref:'any',note:''},
-  nb:{name:'',phone:'',svc:'desc',d:ymd(new Date()),t:'10:00',type:'suelta'},
-  nc:{name:'',phone:'',pack:'p5',total:'5',price:'4000'},
-  bl:{d:ymd(new Date()),all:false,from:'12:00',to:'13:00',note:''}};
-
-/* Reglas de horario: lunes a viernes, turnos cada 30 min desde las 8:00. La sesión tiene que terminar a las 20:00 (miércoles y viernes, a las 19:00). Cada servicio tiene su duración. */
+const S={svc:null,day:null,time:null,month:new Date(today0().getFullYear(),today0().getMonth(),1),
+  form:{name:'',phone:'',kind:'suelta',note:'',weeks:'',first:'',health:''},sent:false,
+  cancel:{name:'',d:'',t:'10:00'},cancelOpen:false};
 function rule(d){const w=d.getDay();if(w===0||w===6)return null;return{first:8*60,close:(w===3||w===5)?19*60:20*60}}
-function slotsAll(k,pub,du){
-  pub=pub||PUB;du=du||60;const d=parseD(k),r=rule(d);if(!r)return[];
+function slotsFor(k,du){
+  const d=parseD(k),r=rule(d);if(!r)return[];
   const now=new Date(),out=[];
   for(let s=r.first;s+du<=r.close;s+=30){
     const st=new Date(d.getFullYear(),d.getMonth(),d.getDate(),Math.floor(s/60),s%60);
     if(st<=now)continue;
-    if(pub.blocks.some(b=>b.d===k&&s<mins(b.to)&&s+du>mins(b.from)))continue;
-    const busy=pub.taken.some(x=>x.d===k&&s<mins(x.t)+(x.u||60)&&s+du>mins(x.t));
-    out.push({h:hhmm(s),free:!busy});
+    out.push(hhmm(s));
   }
   return out;
 }
-function slotsFor(k,pub,du){return slotsAll(k,pub,du).filter(x=>x.free).map(x=>x.h)}
-
-const lotus=()=>'<svg viewBox="350 170 480 365" role="img" aria-label="Flor de loto de Hábita"><path fill="#C193B9" d="M438 296C490 305 520 322 545 345L548 455C480 440 440 380 438 296Z"/><path fill="#C193B9" d="M742 296C690 305 660 322 635 345L632 455C700 440 740 380 742 296Z"/><path fill="#C27F6C" d="M355 396C420 385 500 392 548 450C565 470 580 495 590 518C510 535 400 520 355 396Z"/><path fill="#C27F6C" d="M825 396C760 385 680 392 632 450C615 470 600 495 590 518C670 535 780 520 825 396Z"/><path fill="#AE6A43" d="M590 250C560 285 535 335 535 385C535 440 560 485 590 518C620 485 645 440 645 385C645 335 620 285 590 250Z"/><circle cx="590" cy="212" r="37" fill="#AE6A43"/></svg>';
-
-/* ---------- Vista de clientas ---------- */
-function clientView(){
-  return (S.owner?'<div class="bar"><span>Así ven la página tus clientas.</span><button class="btn sm ghost" type="button" data-a="view" data-v="panel">Abrir mi agenda</button></div>':'')+
-  '<header class="brand">'+lotus()+'<h1>Hábita</h1><div class="tag">Cuerpo, energía y alma</div></header>'+
-  '<p class="lead">Elegí tu sesión, el día y el horario.</p>'+
-  '<dl class="rules">'+
-    '<div><dt>Precio</dt><dd>Sesión individual: '+money(1000)+'. Masaje para embarazadas: '+money(1500)+'.</dd></div>'+
-    '<div><dt>Seña</dt><dd>Las sesiones individuales se confirman con una seña del 50% ('+money(500)+'; '+money(750)+' en el masaje para embarazadas). Con cuponera no hace falta.</dd></div>'+
-    '<div><dt>Cancelación</dt><dd>Podés cancelar o cambiar tu turno sin costo hasta 24 horas antes. De lo contrario se cobra la sesión.</dd></div>'+
-    '<div><dt>Cuponeras</dt><dd>'+PACKS.map(x=>x.label+': '+money(x.price)).join(' · ')+'. Consultá por promos activas. En cada turno te aviso qué sesión de tu cuponera es.</dd></div>'+
-  '</dl>'+stepServicio()+stepDia()+stepDatos()+cancelBox()+
-  '<footer class="foot"><p>Atiendo de lunes a viernes, de 8:00 a 20:00 (miércoles y viernes hasta las 19:00).</p><p>Estoy en Lagomar Sur.</p><p><a href="https://www.instagram.com/habita_terapias" target="_blank" rel="noopener">@habita_terapias en Instagram</a></p></footer>';
+function dayOpen(k){
+  const d=parseD(k),t0=today0();
+  if(!rule(d)||d<t0||d>addDays(t0,90))return false;
+  return slotsFor(k,curDur()).length>0;
 }
+
 function stepServicio(){
   return '<section class="step" id="s1" data-done="'+(S.svc?1:0)+'"><div class="sh"><span class="num">1</span><h2>Tu sesión</h2></div><div class="svc">'+
   SERVICES.map(s=>'<button class="opt big" type="button" data-a="svc" data-v="'+s.id+'" aria-pressed="'+(S.svc===s.id)+'"><span class="top"><span>'+esc(s.name)+'</span><small>'+durTxt(s.dur)+' · '+money(s.price)+'</small></span>'+(s.desc?'<span class="desc">'+esc(s.desc)+'</span>':'')+'</button>').join('')+'</div></section>';
-}
-function dayState(k){
-  const d=parseD(k),t0=today0(),r=rule(d);
-  if(!r||d<t0||d>addDays(t0,90))return 'closed';
-  if(PUB.blocks.some(b=>b.d===k&&mins(b.from)<=r.first&&mins(b.to)>=r.close))return 'closed';
-  if(slotsFor(k,null,curDur()).length)return 'free';
-  return slotsAll(k,null,curDur()).length?'full':'closed';
-}
-function wlState(){
-  const w=S.wl,name=(w.name||S.form.name).trim(),phone=(w.phone||S.form.phone).trim();
-  const ok=!!(S.svc&&S.day&&name.length>1&&phone.replace(/\D/g,'').length>=8);
-  const text=ok?['Hola! Quiero anotarme en la lista de espera de Hábita.','Sesión: '+svcName(S.svc),'Día: '+fmtDay(S.day),(S.wlTime?'Horario: a las '+S.wlTime+' (ocupado, avisame si se libera)':'Horario: '+PREFS[w.pref].toLowerCase()),'Nombre: '+name,'WhatsApp: '+phone,'Si se libera un lugar, avisame por acá.'].join('\n'):'';
-  return{ok,name,phone,href:ok?wa(CFG.WA,text):'#'};
-}
-function waitBox(open){
-  const w=S.wl,st=wlState();
-  return '<details class="cancel" id="wdet"'+((open||S.wlOpen)?' open':'')+'><summary>'+(open?'Anotarme en la lista de espera':'¿Preferís otro horario? Lista de espera')+'</summary><div class="in">'+
-  '<p class="small" style="margin:0">Si se libera un lugar, te aviso por WhatsApp.</p>'+
-  '<label class="field">Nombre<input id="w-name" autocomplete="name" value="'+esc(st.name)+'"></label>'+
-  '<label class="field">WhatsApp<input id="w-phone" type="tel" inputmode="tel" autocomplete="tel" value="'+esc(st.phone)+'"></label>'+
-  (S.wlTime?'<p class="note">Te aviso si se libera el horario de las <b>'+S.wlTime+'</b>. <button class="btn plain" type="button" data-a="wlclear">Prefiero otro</button></p>':'<label class="field">Horario que te sirve<select id="w-pref">'+Object.keys(PREFS).map(k=>'<option value="'+k+'"'+(w.pref===k?' selected':'')+'>'+PREFS[k]+'</option>').join('')+'</select></label>')+
-  '<a class="btn" id="wcta" href="'+esc(st.href)+'" target="_blank" rel="noopener" data-a="wl" aria-disabled="'+(st.ok?'false':'true')+'">Anotarme por WhatsApp</a></div></details>';
 }
 function stepDia(){
   const m=S.month,t0=today0(),maxD=addDays(t0,90);
   const lead=(new Date(m.getFullYear(),m.getMonth(),1).getDay()+6)%7;
   const dim=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();
-  let cells='',anyFull=false;
+  let cells='';
   for(let i=0;i<lead;i++)cells+='<span></span>';
   for(let d=1;d<=dim;d++){
-    const k=ymd(new Date(m.getFullYear(),m.getMonth(),d)),st=dayState(k);
-    if(st==='full')anyFull=true;
-    cells+='<button class="day" type="button" data-a="day" data-v="'+k+'"'+(st==='closed'?' disabled':'')+' aria-pressed="'+(S.day===k)+'"'+(st==='full'?' data-full="1"':'')+(ymd(t0)===k?' data-today="1"':'')+'>'+d+'</button>';
+    const k=ymd(new Date(m.getFullYear(),m.getMonth(),d));
+    cells+='<button class="day" type="button" data-a="day" data-v="'+k+'"'+(dayOpen(k)?'':' disabled')+' aria-pressed="'+(S.day===k)+'"'+(ymd(t0)===k?' data-today="1"':'')+'>'+d+'</button>';
   }
   const prevOk=m>new Date(t0.getFullYear(),t0.getMonth(),1);
   const nextOk=new Date(m.getFullYear(),m.getMonth()+1,1)<=maxD;
   let slots='';
   if(S.day){
-    const all=slotsAll(S.day,null,curDur()),nfree=all.filter(x=>x.free).length,anyBusy=all.some(x=>!x.free);
+    const hs=slotsFor(S.day,curDur());
     slots='<div id="slots" style="scroll-margin-top:12px"><p class="dayh">'+esc(fmtDay(S.day))+'</p>'+
-      (all.length?'<div class="slots">'+all.map(x=>x.free?'<button class="slot" type="button" data-a="time" data-v="'+x.h+'" aria-pressed="'+(S.time===x.h)+'">'+x.h+'</button>':'<button class="slot busy" type="button" data-a="busy" data-v="'+x.h+'" aria-pressed="'+(S.wlTime===x.h)+'" aria-label="'+x.h+', ocupado. Anotarme en la lista de espera"><s>'+x.h+'</s><span>Ocupado</span></button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
-      (anyBusy?'<p class="legend">Los horarios tachados están ocupados. Tocá uno para anotarte en la lista de espera.</p>':'')+
-      (nfree===0&&anyBusy?'<p class="note">Ese día está completo. Anotate en la lista de espera y te aviso si se libera un lugar.</p>':'')+
-      (all.length?waitBox(nfree===0||!!S.wlTime):'')+'</div>';
+      (hs.length?'<div class="slots">'+hs.map(h=>'<button class="slot" type="button" data-a="time" data-v="'+h+'" aria-pressed="'+(S.time===h)+'">'+h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
+      '<p class="legend">Elegí el horario que más te guste. Yo te confirmo la disponibilidad por WhatsApp.</p></div>';
   }
   return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>Día y horario</h2></div>'+
   '<div class="cal"><div class="calh"><button class="iconb" type="button" data-a="mon" data-v="-1" aria-label="Mes anterior"'+(prevOk?'':' disabled')+'>‹</button><strong>'+MONTHS[m.getMonth()]+' '+m.getFullYear()+'</strong><button class="iconb" type="button" data-a="mon" data-v="1" aria-label="Mes siguiente"'+(nextOk?'':' disabled')+'>›</button></div>'+
-  '<div class="grid7">'+['L','M','M','J','V','S','D'].map(x=>'<span class="wd">'+x+'</span>').join('')+cells+'</div>'+(anyFull?'<p class="legend">Los días tachados están completos: podés anotarte en la lista de espera.</p>':'')+'</div>'+slots+'</section>';
+  '<div class="grid7">'+['L','M','M','J','V','S','D'].map(x=>'<span class="wd">'+x+'</span>').join('')+cells+'</div></div>'+slots+'</section>';
 }
 function reqMsg(){
   const f=S.form;
-  return ['Hola! Quiero reservar un turno en Hábita.','Sesión: '+svcName(S.svc),'Día y hora: '+fmtDay(S.day)+', '+S.time+' ('+durTxt(curDur())+')','Nombre: '+f.name.trim(),'WhatsApp: '+f.phone.trim(),
-    f.kind==='cup'?'Tengo cuponera.':'Sesión individual ('+money(svcOf(S.svc).price)+'): abono la seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+') para confirmar el turno.',f.first==='si'?'Es mi primera vez en Hábita.':f.first==='no'?'Ya vine antes.':'',f.first==='si'&&f.health.trim()?'Salud: '+f.health.trim():'',S.svc==='emb'&&f.weeks.trim()?'Semanas de embarazo: '+f.weeks.trim():'',f.note.trim()?'Nota: '+f.note.trim():''].filter(Boolean).join('\n');
+  return ['Hola! Quiero pedir un turno en Hábita.','Sesión: '+svcName(S.svc),'Día y hora que me gustaría: '+fmtDay(S.day)+', '+S.time+' ('+durTxt(curDur())+')','Nombre: '+f.name.trim(),'WhatsApp: '+f.phone.trim(),
+    f.kind==='cup'?'Tengo cuponera.':'Sesión individual ('+money(svcOf(S.svc).price)+'): abono la seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+') para confirmar el turno.',
+    f.first==='si'?'Es mi primera vez en Hábita.':f.first==='no'?'Ya vine antes.':'',
+    f.first==='si'&&f.health.trim()?'Salud: '+f.health.trim():'',
+    S.svc==='emb'&&f.weeks.trim()?'Semanas de embarazo: '+f.weeks.trim():'',
+    f.note.trim()?'Nota: '+f.note.trim():'',
+    'Quedo atenta a tu confirmación.'].filter(Boolean).join('\n');
 }
-function ctaState(){const f=S.form;const ok=f.name.trim().length>1&&f.phone.replace(/\D/g,'').length>=8&&S.svc&&S.day&&S.time;return{ok:!!ok,href:ok?wa(CFG.WA,reqMsg()):'#'}}
+function ctaState(){const f=S.form;const ok=f.name.trim().length>1&&f.phone.replace(/\D/g,'').length>=8&&S.svc&&S.day&&S.time;return{ok:!!ok,href:ok?wa(WA,reqMsg()):'#'}}
 function stepDatos(){
   const f=S.form,locked=!S.time;
   if(S.sent&&!locked){
     return '<section class="step" id="s3" data-done="1"><div class="sh"><span class="num">3</span><h2>Enviá tu pedido</h2></div>'+
     '<div class="sum"><b>'+esc(svcName(S.svc))+'</b><span>'+esc(fmtDay(S.day))+' a las '+S.time+' · '+durTxt(curDur())+'</span></div>'+
-    '<p class="note">Enviá el mensaje que se armó en WhatsApp. Tu turno queda reservado cuando yo te lo confirme por WhatsApp'+(f.kind==='suelta'?' y se acredite la seña':'')+'.</p>'+
+    '<p class="note">Enviá el mensaje que se armó en WhatsApp. Tu turno queda reservado cuando yo te lo confirme por ahí'+(f.kind==='suelta'?' y se acredite la seña':'')+'. Si ese horario no está disponible, te propongo otro.</p>'+
     '<a class="btn" href="'+esc(ctaState().href)+'" target="_blank" rel="noopener">Abrir WhatsApp de nuevo</a>'+
     '<button class="btn plain" type="button" data-a="reset">Hacer otro pedido</button></section>';
   }
@@ -291,13 +252,13 @@ function stepDatos(){
   return '<section class="step" id="s3" data-locked="'+(locked?1:0)+'"><div class="sh"><span class="num">3</span><h2>Tus datos</h2></div>'+
   (S.time?'<div class="sum"><b>'+esc(svcName(S.svc))+'</b><span>'+esc(fmtDay(S.day))+' a las '+S.time+' · '+durTxt(curDur())+'</span></div>':'')+
   '<div class="seg"><button class="opt" type="button" data-a="kind" data-v="suelta" aria-pressed="'+(f.kind==='suelta')+'">Sesión individual</button><button class="opt" type="button" data-a="kind" data-v="cup" aria-pressed="'+(f.kind==='cup')+'">Tengo cuponera</button></div>'+
-  '<p class="note">'+(f.kind==='suelta'?'Para confirmar el turno se abona una seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+'). Después de pedirlo te paso los datos para transferirla.':'No hace falta seña. Te aviso qué sesión de tu cuponera es.')+'</p>'+
-  '<label class="field">Nombre<input id="f-name" autocomplete="name" value="'+esc(f.name)+'"></label>'+
-  '<label class="field">WhatsApp<input id="f-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="'+esc(f.phone)+'"></label>'+
+  '<p class="note">'+(f.kind==='suelta'?'Para confirmar el turno se abona una seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+'). Cuando te confirme la disponibilidad te paso los datos para transferirla.':'No hace falta seña. Te aviso qué sesión de tu cuponera es.')+'</p>'+
+  '<label class="field">Nombre<input id="f-name" data-g="f" data-k="name" autocomplete="name" value="'+esc(f.name)+'"></label>'+
+  '<label class="field">WhatsApp<input id="f-phone" data-g="f" data-k="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="'+esc(f.phone)+'"></label>'+
   '<div class="field">¿Es tu primera vez en Hábita?<div class="seg"><button class="opt" type="button" data-a="first" data-v="si" aria-pressed="'+(f.first==='si')+'">Sí</button><button class="opt" type="button" data-a="first" data-v="no" aria-pressed="'+(f.first==='no')+'">Ya vine antes</button></div></div>'+
-  (f.first==='si'?'<label class="field">Lesiones, alergias o condiciones médicas que deba saber (opcional)<input id="f-health" value="'+esc(f.health)+'"></label>':'')+
-  (S.svc==='emb'?'<label class="field">Semanas de embarazo (opcional)<input id="f-weeks" inputmode="numeric" value="'+esc(f.weeks)+'"></label>':'')+
-  '<label class="field">Algo que quieras contarme (opcional)<input id="f-note" value="'+esc(f.note)+'"></label>'+
+  (f.first==='si'?'<label class="field">Lesiones, alergias o condiciones médicas que deba saber (opcional)<input id="f-health" data-g="f" data-k="health" value="'+esc(f.health)+'"></label>':'')+
+  (S.svc==='emb'?'<label class="field">Semanas de embarazo (opcional)<input id="f-weeks" data-g="f" data-k="weeks" inputmode="numeric" value="'+esc(f.weeks)+'"></label>':'')+
+  '<label class="field">Algo que quieras contarme, o otro horario que te sirva (opcional)<input id="f-note" data-g="f" data-k="note" value="'+esc(f.note)+'"></label>'+
   '<a class="btn" id="cta" href="'+esc(c.href)+'" target="_blank" rel="noopener" data-a="sent" aria-disabled="'+(c.ok?'false':'true')+'">Pedir turno por WhatsApp</a>'+
   '<p class="small" style="margin:0;text-align:center">Se abre WhatsApp con el pedido ya escrito.</p></section>';
 }
@@ -312,469 +273,65 @@ function cancelState(){
   }
   ok=ok&&c.name.trim().length>1;
   const text='Hola! Quiero cancelar mi turno de Hábita del '+(c.d?fmtDay(c.d):'')+' a las '+c.t+'. Soy '+c.name.trim()+'.';
-  return{msg,ok,href:ok?wa(CFG.WA,text):'#'};
+  return{msg,ok,href:ok?wa(WA,text):'#'};
 }
 function cancelBox(){
   const c=S.cancel,st=cancelState();
   return '<details class="cancel" id="cdet"'+(S.cancelOpen?' open':'')+'><summary>¿Necesitás cancelar un turno?</summary><div class="in">'+
-  '<label class="field">Nombre<input id="c-name" autocomplete="name" value="'+esc(c.name)+'"></label>'+
-  '<div class="formgrid"><label class="field">Día del turno<input id="c-d" type="date" min="'+ymd(new Date())+'" value="'+esc(c.d)+'"></label>'+
-  '<label class="field">Hora<select id="c-t">'+TIMES.slice(0,-1).map(h=>'<option'+(h===c.t?' selected':'')+'>'+h+'</option>').join('')+'</select></label></div>'+
+  '<label class="field">Nombre<input id="c-name" data-g="c" data-k="name" autocomplete="name" value="'+esc(c.name)+'"></label>'+
+  '<div class="formgrid"><label class="field">Día del turno<input id="c-d" data-g="c" data-k="d" type="date" min="'+ymd(new Date())+'" value="'+esc(c.d)+'"></label>'+
+  '<label class="field">Hora<select id="c-t" data-g="c" data-k="t">'+TIMES_X.map(h=>'<option'+(h===c.t?' selected':'')+'>'+h+'</option>').join('')+'</select></label></div>'+
   '<p class="note" id="cmsg"'+(st.msg?'':' hidden')+'>'+esc(st.msg)+'</p>'+
   '<a class="btn ghost" id="ccta" href="'+esc(st.href)+'" target="_blank" rel="noopener" aria-disabled="'+(st.ok?'false':'true')+'">Avisar por WhatsApp</a></div></details>';
 }
-
-/* ---------- Panel privado ---------- */
-const act=b=>b.st==='pend'||b.st==='conf';
-function cupUsed(c){return S.bookings.filter(b=>b.cup===c.id&&(b.st==='conf'||b.st==='done'||b.st==='cobr')).sort(cmp)}
-function cupInfo(b){
-  if(!b.cup)return null;const c=S.cups.find(x=>x.id===b.cup);if(!c)return null;
-  const i=cupUsed(c).findIndex(x=>x.id===b.id);
-  return{n:i>=0?i+1:0,total:c.total};
+function view(){
+  return '<div class="wrap"><header class="brand">'+lotus()+'<h1>Hábita</h1><div class="tag">Cuerpo, energía y alma</div></header>'+
+  '<p class="lead">Elegí tu sesión, el día y el horario que te gustaría. Yo te confirmo por WhatsApp.</p>'+
+  '<dl class="rules">'+
+    '<div><dt>Precio</dt><dd>Sesión individual: '+money(1000)+'. Masaje para embarazadas: '+money(1500)+'.</dd></div>'+
+    '<div><dt>Seña</dt><dd>Las sesiones individuales se confirman con una seña del 50% ('+money(500)+'; '+money(750)+' en el masaje para embarazadas). Con cuponera no hace falta.</dd></div>'+
+    '<div><dt>Cancelación</dt><dd>Podés cancelar o cambiar tu turno sin costo hasta 24 horas antes. De lo contrario se cobra la sesión.</dd></div>'+
+    '<div><dt>Cuponeras</dt><dd>'+PACKS.map(x=>x.label+': '+money(x.price)).join(' · ')+'. Consultá por promos activas. En cada turno te aviso qué sesión de tu cuponera es.</dd></div>'+
+  '</dl>'+stepServicio()+stepDia()+stepDatos()+cancelBox()+
+  '<footer class="foot"><p>Atiendo de lunes a viernes, de 8:00 a 20:00 (miércoles y viernes hasta las 19:00).</p><p>Estoy en Lagomar Sur.</p><p><a href="'+IG+'" target="_blank" rel="noopener">@habita_terapias en Instagram</a></p></footer></div>';
 }
-function payload(){
-  const t=ymd(new Date());
-  return{
-    taken:S.bookings.filter(b=>act(b)&&b.d>=t).map(b=>({d:b.d,t:b.t,u:dur(b.svc)})).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t)),
-    blocks:S.blocks.filter(b=>b.d>=t).map(b=>({d:b.d,from:b.from,to:b.to})).sort((a,b)=>(a.d+a.from).localeCompare(b.d+b.from))
-  };
-}
-function isDirty(){
-  const t=ymd(new Date()),p=payload();
-  const cur={taken:PUB.taken.filter(x=>x.d>=t),blocks:PUB.blocks.filter(x=>x.d>=t)};
-  return JSON.stringify(p)!==JSON.stringify(cur);
-}
-function stamp(){try{return new Date(PUB.updated).toLocaleString('es-UY',{dateStyle:'short',timeStyle:'short'})}catch(e){return ''}}
-function panelView(){
-  const head='<div class="bar"><strong>Mi agenda</strong><button class="btn sm ghost" type="button" data-a="view" data-v="client">Ver página de clientas</button></div>';
-  if(!S.db)return head+'<p class="note">No pude abrir tu agenda en este momento. Recargá la página. Si sigue igual, avisame.</p>';
-  const ready=S.ready.bookings&&S.ready.blocks&&S.ready.cups&&S.ready.wait,dirty=ready&&isDirty();
-  const pub='<div class="card"><div class="row"><div><strong>Horarios que ven tus clientas</strong><div class="small">'+
-    (!ready?'Cargando tu agenda…':dirty?'Hay cambios sin publicar: tus clientas todavía ven horarios viejos.':'Están al día.')+(PUB.updated?' Última publicación: '+esc(stamp())+'.':'')+
-    '</div></div><button class="btn sm" type="button" data-a="publish"'+(dirty?'':' disabled')+'>Publicar horarios</button></div></div>';
-  const tabs=[['hoy','Recordatorios'],['tur','Turnos'],['cli','Clientas'],['esp','Espera'],['cup','Cuponeras'],['blo','Bloqueos'],['res','Resumen']];
-  const nav='<div class="tabs">'+tabs.map(t=>'<button class="tab" type="button" data-a="tab" data-v="'+t[0]+'" aria-pressed="'+(S.tab===t[0])+'">'+t[1]+(t[0]==='esp'&&waitMatches()?'<span class="badge">'+waitMatches()+'</span>':'')+'</button>').join('')+'</div>';
-  const body=S.tab==='hoy'?tabHoy():S.tab==='tur'?tabTurnos():S.tab==='cli'?tabClientas():S.tab==='esp'?tabEspera():S.tab==='cup'?tabCups():S.tab==='res'?tabResumen():tabBloqueos();
-  return head+pub+nav+(S.tab==='esp'?'':waitBanner())+body;
-}
-function sessionTxt(b){const ci=cupInfo(b);return ci&&ci.n?' Es tu sesión '+ci.n+' de '+ci.total+' de la cuponera.':''}
-function remMsg(b,f){
-  const n=first(b.name),sv=svcName(b.svc);
-  if(f==='rem1')return 'Hola '+n+'! Te recuerdo tu turno de mañana ('+fmtDay(b.d)+') a las '+b.t+' en Hábita ('+sv+').'+sessionTxt(b)+' Si no podés venir, avisame lo antes posible: las cancelaciones con menos de 24 horas se cobran. ¡Te espero!';
-  return 'Hola '+n+'! Hoy a las '+b.t+' te espero en Hábita ('+sv+').'+sessionTxt(b)+' ¡Nos vemos!';
-}
-function confMsg(b){
-  let m='Hola '+first(b.name)+'! ';
-  m+=b.st==='pend'?'Te reservé '+svcName(b.svc)+' el '+fmtDay(b.d)+' a las '+b.t+'. Para confirmar el turno necesito una seña de '+money(Math.round(svcOf(b.svc).price/2))+' (50%) por transferencia a '+BANK.name+', cuenta Nº '+BANK.acct+', titular '+BANK.holder+'. Cuando la hagas, mandame el comprobante por acá.':'Tu turno de '+svcName(b.svc)+' quedó confirmado para el '+fmtDay(b.d)+' a las '+b.t+'.';
-  return m+sessionTxt(b)+' Podés cancelar o cambiar tu turno sin costo hasta 24 horas antes.';
-}
-function remBlock(title,list,flag){
-  return '<section class="card"><h3>'+esc(title)+'</h3>'+(list.length?list.map(b=>{
-    const ph=waPhone(b.phone);
-    return '<div class="item"><div class="row"><div><span class="time">'+b.t+'</span>'+esc(b.name)+'<div class="small">'+esc(svcName(b.svc))+(cupInfo(b)&&cupInfo(b).n?' · sesión '+cupInfo(b).n+' de '+cupInfo(b).total:'')+'</div></div>'+
-    '<div class="row">'+(ph?'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(ph,remMsg(b,flag)))+'">Mandar recordatorio</a>':'<span class="small">Sin teléfono</span>')+
-    '<label class="chk"><input type="checkbox" data-a="rem" data-id="'+b.id+'" data-f="'+flag+'"'+(b[flag]?' checked':'')+'> Enviado</label></div></div></div>';
-  }).join(''):'<p class="small" style="margin:0">No hay turnos.</p>')+'</section>';
-}
-function tabHoy(){
-  const now=new Date(),t0=ymd(now),t1=ymd(addDays(now,1)),a=S.bookings.filter(act);
-  return '<p class="small" style="margin:0">Cada botón abre WhatsApp con el mensaje escrito. Mandalo por la mañana y marcá «Enviado».</p>'+
-  remBlock('Mañana · '+fmtDay(t1),a.filter(b=>b.d===t1).sort(cmp),'rem1')+remBlock('Hoy · '+fmtDay(t0),a.filter(b=>b.d===t0).sort(cmp),'rem0')+fuBlock()+renewBlock();
-}
-function cupOptions(){
-  return '<option value="suelta">Sesión individual (con seña)</option>'+S.cups.filter(c=>cupUsed(c).length<c.total&&(!c.only||c.only===S.nb.svc)).map(c=>'<option value="'+c.id+'"'+(S.nb.type===c.id?' selected':'')+'>Cuponera de '+esc(c.name)+' ('+cupUsed(c).length+'/'+c.total+')</option>').join('');
-}
-function bookingRow(b){
-  const ci=cupInfo(b),ph=waPhone(b.phone),open=S.cancelId===b.id;
-  const hrs=(new Date(parseD(b.d).getFullYear(),parseD(b.d).getMonth(),parseD(b.d).getDate(),Math.floor(mins(b.t)/60),mins(b.t)%60)-new Date())/36e5;
-  let acts='';
-  if(b.st==='pend')acts+='<button class="btn sm" type="button" data-a="st" data-id="'+b.id+'" data-s="conf">Seña recibida</button>';
-  if(act(b))acts+='<button class="btn sm ghost" type="button" data-a="st" data-id="'+b.id+'" data-s="done">Realizada</button><button class="btn sm ghost" type="button" data-a="cx" data-id="'+b.id+'">Cancelar</button>';
-  if(act(b)&&ph)acts+='<a class="btn sm ghost" target="_blank" rel="noopener" href="'+esc(wa(ph,confMsg(b)))+'">Avisar por WhatsApp</a>';
-  if(act(b))acts+='<button class="btn sm ghost" type="button" data-a="mv" data-id="'+b.id+'">Cambiar horario</button>';
-  if(b.st==='done'&&ph)acts+='<a class="btn sm ghost" target="_blank" rel="noopener" href="'+esc(wa(ph,fuMsg(b)))+'">Seguimiento</a>';
-  acts+='<button class="btn sm plain" type="button" data-a="del" data-id="'+b.id+'">Eliminar</button>';
-  return '<div class="item"><div class="row"><div><span class="time">'+b.t+'</span>'+esc(b.name)+'<div class="small">'+esc(svcName(b.svc))+' · hasta las '+hhmm(mins(b.t)+dur(b.svc))+(b.phone?' · '+esc(b.phone):'')+'</div></div>'+
-    '<div class="acts"><span class="chip '+b.st+'">'+STATUS[b.st]+'</span>'+(ci&&ci.n?'<span class="chip cup">Sesión '+ci.n+' de '+ci.total+'</span>':'')+'</div></div>'+
-    '<div class="acts">'+acts+'</div>'+
-    (S.mv.id===b.id?mvForm(b):'')+
-    (open?'<div class="note">'+(hrs<24&&hrs>-1?'Faltan menos de 24 horas: según tu política se cobra la sesión.':'Faltan más de 24 horas: sin cargo.')+'<div class="acts" style="margin-top:8px"><button class="btn sm" type="button" data-a="st" data-id="'+b.id+'" data-s="canc">Cancelar sin cargo</button><button class="btn sm ghost" type="button" data-a="st" data-id="'+b.id+'" data-s="cobr">Cancelar y cobrar sesión</button></div></div>':'')+'</div>';
-}
-function tabTurnos(){
-  const f=S.nb,t=ymd(new Date());
-  const form='<section class="card"><h3>Agregar turno</h3>'+
-  '<div class="formgrid"><label class="field">Nombre<input id="nb-name" autocomplete="off" value="'+esc(f.name)+'"></label><label class="field">WhatsApp<input id="nb-phone" type="tel" value="'+esc(f.phone)+'"></label></div><div class="sug" data-for="nb" hidden></div>'+
-  '<label class="field">Sesión<select id="nb-svc">'+SERVICES.map(s=>'<option value="'+s.id+'"'+(f.svc===s.id?' selected':'')+'>'+esc(s.name)+'</option>').join('')+'</select></label>'+
-  '<div class="formgrid"><label class="field">Día<input id="nb-d" type="date" value="'+esc(f.d)+'"></label><label class="field">Hora<select id="nb-t">'+TIMES.slice(0,-1).map(h=>'<option'+(h===f.t?' selected':'')+'>'+h+'</option>').join('')+'</select></label></div>'+
-  '<label class="field">Tipo<select id="nb-type">'+cupOptions()+'</select></label>'+
-  '<button class="btn" type="button" data-a="addb">Guardar turno</button></section>';
-  const up=S.bookings.filter(b=>b.d>=t).sort(cmp),past=S.bookings.filter(b=>b.d<t).sort(cmp).reverse().slice(0,30);
-  let list='',cur='';
-  up.forEach(b=>{if(b.d!==cur){cur=b.d;list+='<div class="dayh">'+esc(fmtDay(b.d))+'</div>'}list+=bookingRow(b)});
-  return form+'<section class="card"><h3>Próximos turnos</h3>'+(list||'<p class="small" style="margin:0">Todavía no hay turnos cargados.</p>')+'</section>'+
-  (past.length?'<details class="cancel"><summary>Turnos anteriores</summary><div class="in">'+past.map(bookingRow).join('')+'</div></details>':'');
-}
-function tabCups(){
-  const f=S.nc;
-  const form='<section class="card"><h3>Nueva cuponera</h3><div class="formgrid"><label class="field">Nombre<input id="nc-name" autocomplete="off" value="'+esc(f.name)+'"></label><label class="field">WhatsApp<input id="nc-phone" type="tel" value="'+esc(f.phone)+'"></label></div><div class="sug" data-for="nc" hidden></div>'+
-  '<label class="field">Cuponera<select id="nc-pack">'+PACKS.map(x=>'<option value="'+x.id+'"'+(f.pack===x.id?' selected':'')+'>'+esc(x.label)+' · '+money(x.price)+'</option>').join('')+'<option value="custom"'+(f.pack==='custom'?' selected':'')+'>Otra (a convenir)</option></select></label>'+
-  '<div class="formgrid"><label class="field">Cantidad de sesiones<input id="nc-total" type="number" inputmode="numeric" min="1" max="50" value="'+esc(f.total)+'"></label><label class="field">Precio ($)<input id="nc-price" type="number" inputmode="numeric" min="0" value="'+esc(f.price)+'"></label></div>'+
-  '<button class="btn" type="button" data-a="addc">Crear cuponera</button></section>';
-  const list=S.cups.slice().sort((a,b)=>(b.created||0)-(a.created||0)).map(c=>{
-    const u=cupUsed(c),pc=Math.min(100,Math.round(u.length/c.total*100));
-    return '<div class="item"><div class="row"><div><strong>'+esc(c.name)+'</strong><div class="small">'+u.length+' de '+c.total+' sesiones usadas'+(u.length>=c.total?' · completa':'')+(c.price?' · '+money(c.price):'')+(c.only?' · solo embarazadas':'')+'</div></div><div class="acts">'+(waPhone(c.phone)&&c.total-u.length<=1?'<a class="btn sm ghost" target="_blank" rel="noopener" href="'+esc(wa(waPhone(c.phone),renewMsg(c,c.total-u.length)))+'">Ofrecer renovación</a>':'')+'<button class="btn sm plain" type="button" data-a="delc" data-id="'+c.id+'">Eliminar</button></div></div>'+
-    '<div class="bar-prog"><i style="width:'+pc+'%"></i></div>'+(u.length?'<div class="small">'+u.map((b,i)=>(i+1)+'. '+esc(fmtDay(b.d))).join(' · ')+'</div>':'')+'</div>';
-  }).join('');
-  return form+'<section class="card"><h3>Cuponeras</h3>'+(list||'<p class="small" style="margin:0">Todavía no creaste ninguna.</p>')+'</section>';
-}
-function tabBloqueos(){
-  const f=S.bl,t=ymd(new Date());
-  const form='<section class="card"><h3>Bloquear horarios</h3><p class="small" style="margin:0">Para vacaciones, feriados o ratos en que no atendés. Tus clientas lo ven cuando tocás «Publicar horarios».</p>'+
-  '<label class="field">Día<input id="bl-d" type="date" value="'+esc(f.d)+'"></label>'+
-  '<div class="seg"><button class="opt" type="button" data-a="blmode" data-v="hours" aria-pressed="'+(!f.all)+'">Unas horas</button><button class="opt" type="button" data-a="blmode" data-v="day" aria-pressed="'+f.all+'">Todo el día</button></div>'+
-  (f.all?'':'<div class="formgrid"><label class="field">Desde<select id="bl-from">'+TIMES.slice(0,-1).map(h=>'<option'+(h===f.from?' selected':'')+'>'+h+'</option>').join('')+'</select></label><label class="field">Hasta<select id="bl-to">'+TIMES.slice(1).map(h=>'<option'+(h===f.to?' selected':'')+'>'+h+'</option>').join('')+'</select></label></div>')+
-  '<label class="field">Motivo (opcional, solo lo ves vos)<input id="bl-note" value="'+esc(f.note)+'"></label><button class="btn" type="button" data-a="addbl">Bloquear</button></section>';
-  const list=S.blocks.filter(b=>b.d>=t).sort((a,b)=>(a.d+a.from).localeCompare(b.d+b.from)).map(b=>
-    '<div class="item"><div class="row"><div>'+esc(fmtDay(b.d))+' · '+(b.from==='00:00'&&b.to==='24:00'?'todo el día':b.from+' a '+b.to)+(b.note?'<div class="small">'+esc(b.note)+'</div>':'')+'</div><button class="btn sm plain" type="button" data-a="delbl" data-id="'+b.id+'">Quitar</button></div></div>').join('');
-  return form+'<section class="card"><h3>Bloqueos próximos</h3>'+(list||'<p class="small" style="margin:0">No hay bloqueos.</p>')+'</section>';
-}
-
-/* ---------- Lista de espera (panel) ---------- */
-const inPref=(h,p)=>p==='am'?mins(h)<13*60:p==='pm'?mins(h)>=13*60:true;
-function waitFree(w){return w.d<ymd(new Date())?[]:slotsFor(w.d,payload(),dur(w.svc)).filter(h=>inPref(h,w.pref)&&(!w.t||h===w.t))}
-function waitMatches(){return S.wait.filter(w=>waitFree(w).length).length}
-function waitMsg(w,free){return 'Hola '+first(w.name)+'! Se liberó un lugar en Hábita para '+svcName(w.svc)+' el '+fmtDay(w.d)+': '+free.slice(0,5).join(', ')+'. ¿Lo querés? Avisame y te lo reservo.'}
-function waitBanner(){
-  const n=waitMatches();
-  return n?'<div class="note">'+(n===1?'Hay 1 persona':'Hay '+n+' personas')+' en la lista de espera con lugar disponible.<div><button class="btn sm" type="button" data-a="tab" data-v="esp" style="margin-top:8px">Ver lista de espera</button></div></div>':'';
-}
-function tabEspera(){
-  const f=S.nw;
-  const form='<section class="card"><h3>Anotar a alguien</h3>'+
-  '<div class="formgrid"><label class="field">Nombre<input id="nw-name" autocomplete="off" value="'+esc(f.name)+'"></label><label class="field">WhatsApp<input id="nw-phone" type="tel" value="'+esc(f.phone)+'"></label></div><div class="sug" data-for="nw" hidden></div>'+
-  '<label class="field">Sesión<select id="nw-svc">'+SERVICES.map(s=>'<option value="'+s.id+'"'+(f.svc===s.id?' selected':'')+'>'+esc(s.name)+'</option>').join('')+'</select></label>'+
-  '<div class="formgrid"><label class="field">Día<input id="nw-d" type="date" value="'+esc(f.d)+'"></label><label class="field">Horario<select id="nw-pref">'+Object.keys(PREFS).map(k=>'<option value="'+k+'"'+(f.pref===k?' selected':'')+'>'+PREFS[k]+'</option>').join('')+'</select></label></div>'+
-  '<label class="field">Hora exacta (opcional)<select id="nw-t"><option value="">Cualquiera</option>'+TIMES.slice(0,-1).map(h=>'<option'+(h===f.t?' selected':'')+'>'+h+'</option>').join('')+'</select></label>'+
-  '<label class="field">Nota (opcional)<input id="nw-note" value="'+esc(f.note)+'"></label>'+
-  '<button class="btn" type="button" data-a="addw">Anotar en la lista</button></section>';
-  const list=S.wait.slice().sort((a,b)=>a.d.localeCompare(b.d)||(a.created||0)-(b.created||0)).map(w=>{
-    const free=waitFree(w),past=w.d<ymd(new Date()),ph=waPhone(w.phone);
-    return '<div class="item"><div class="row"><div><strong>'+esc(w.name)+'</strong><div class="small">'+esc(svcName(w.svc))+' · '+esc(fmtDay(w.d))+' · '+esc(w.t?'a las '+w.t:(PREFS[w.pref]||PREFS.any))+(w.phone?' · '+esc(w.phone):'')+'</div>'+(w.note?'<div class="small">'+esc(w.note)+'</div>':'')+'</div>'+
-    '<button class="btn sm plain" type="button" data-a="delw" data-id="'+w.id+'">Quitar</button></div>'+
-    (past?'<p class="small" style="margin:0">Ese día ya pasó.</p>':free.length?'<div class="note">Hay lugar. Tocá un horario para darle el turno:<div class="acts" style="margin-top:8px">'+free.slice(0,8).map(h=>'<button class="btn sm" type="button" data-a="give" data-id="'+w.id+'" data-v="'+h+'">'+h+'</button>').join('')+(ph?'<a class="btn sm ghost" target="_blank" rel="noopener" href="'+esc(wa(ph,waitMsg(w,free)))+'">Avisar por WhatsApp</a>':'')+'</div></div>':'<p class="small" style="margin:0">Todavía no hay lugar.</p>')+'</div>';
-  }).join('');
-  return form+'<section class="card"><h3>Lista de espera</h3>'+(list||'<p class="small" style="margin:0">No hay nadie esperando.</p>')+'</section>';
-}
-async function addWait(){
-  const f=S.nw;if(!f.name.trim()||!f.d){toast('Completá el nombre y el día');return}
-  try{await S.db.collection('wait').add({name:f.name.trim(),phone:f.phone.trim(),svc:f.svc,d:f.d,pref:f.pref,t:f.t||'',note:f.note.trim(),created:Date.now()});saveClient(f.name,f.phone);S.nw.name='';S.nw.phone='';S.nw.note='';toast('Anotada en la lista de espera');render()}catch(e){fail(e)}
-}
-async function giveTurn(id,t){
-  const w=S.wait.find(x=>x.id===id);if(!w)return;
-  if(!slotsFor(w.d,payload(),dur(w.svc)).includes(t)){toast('Ese horario ya no está libre');return}
-  try{
-    await S.db.collection('bookings').add({name:w.name,phone:w.phone||'',svc:w.svc,d:w.d,t:t,kind:'suelta',cup:null,st:'pend',rem1:false,rem0:false,created:Date.now()});
-    await S.db.collection('wait').doc(id).delete();
-    S.tab='tur';toast('Turno creado. Avisale por WhatsApp y pedile la seña.');rr();
-  }catch(e){fail(e)}
-}
-
-/* ---------- Clientas ---------- */
-function people(){
-  const m=new Map();
-  const add=(x,doc)=>{
-    if(!x.name||!String(x.name).trim())return;
-    const k=pkey(x.name,x.phone),cur=m.get(k);
-    if(!cur)m.set(k,{key:k,id:doc?x.id:'',doc:doc,name:String(x.name).trim(),phone:x.phone||'',note:doc?(x.note||''):''});
-    else if(!cur.phone&&x.phone)cur.phone=x.phone;
-  };
-  S.clients.forEach(c=>add(c,true));
-  S.bookings.forEach(b=>add(b,false));S.cups.forEach(c=>add(c,false));S.wait.forEach(w=>add(w,false));
-  return Array.from(m.values());
-}
-function suggest(q){
-  const nq=norm(q).trim(),qd=String(q||'').replace(/\D/g,'');
-  if(nq.length<2)return [];
-  const toks=nq.split(/\s+/).filter(Boolean);
-  return people().filter(p=>{
-    const words=norm(p.name).split(/\s+/);
-    return toks.every(t=>words.some(w=>w.indexOf(t)===0))||(qd.length>=3&&(waPhone(p.phone).indexOf(qd)>=0||waPhone(p.phone).indexOf(qd.replace(/^0/,''))>=0));
-  }).sort((a,b)=>(norm(b.name).indexOf(nq)===0)-(norm(a.name).indexOf(nq)===0)||a.name.localeCompare(b.name,'es')).slice(0,6);
-}
-function showSug(g,val){
-  const box=document.querySelector('.sug[data-for="'+g+'"]');if(!box)return;
-  const list=suggest(val);
-  if(!list.length||(list.length===1&&norm(list[0].name)===norm(val).trim()&&GROUPS[g].phone)){box.hidden=true;box.innerHTML='';return}
-  box.innerHTML=list.map(p=>'<button class="sugi" type="button" data-a="pick" data-g="'+g+'" data-k="'+esc(p.key)+'"><strong>'+esc(p.name)+'</strong><span>'+esc(p.phone||'sin WhatsApp')+'</span></button>').join('');
-  box.hidden=false;
-}
-function pickClient(g,k){
-  const p=people().find(x=>x.key===k),t=GROUPS[g];if(!p||!t)return;
-  t.name=p.name;t.phone=p.phone||'';
-  if(g==='nb'){const c=S.cups.find(c=>pkey(c.name,c.phone)===p.key&&cupUsed(c).length<c.total&&(!c.only||c.only===S.nb.svc));if(c)S.nb.type=c.id}
-  render();
-}
-async function saveClient(name,phone){
-  name=String(name||'').trim();phone=String(phone||'').trim();if(!name||!S.db)return;
-  const k=pkey(name,phone),ex=S.clients.find(c=>pkey(c.name,c.phone)===k);
-  try{
-    if(!ex)await S.db.collection('clients').add({name:name,phone:phone,note:'',created:Date.now()});
-    else if(phone&&!ex.phone)await S.db.collection('clients').doc(ex.id).update({phone:phone});
-  }catch(e){}
-}
-function editClient(k){
-  const p=people().find(x=>x.key===k);if(!p)return;
-  S.cl.id=p.id;S.cl.key=p.key;S.cl.name=p.name;S.cl.phone=p.phone;S.cl.note=p.note;render();window.scrollTo(0,0);
-}
-async function saveClientForm(){
-  const c=S.cl,name=c.name.trim(),phone=c.phone.trim(),note=c.note.trim();
-  if(!name){toast('Escribí el nombre');return}
-  try{
-    if(c.id)await S.db.collection('clients').doc(c.id).update({name:name,phone:phone,note:note});
-    else{
-      const k=pkey(name,phone),ex=S.clients.find(x=>pkey(x.name,x.phone)===k);
-      if(ex)await S.db.collection('clients').doc(ex.id).update({name:name,phone:phone,note:note});
-      else await S.db.collection('clients').add({name:name,phone:phone,note:note,created:Date.now()});
-    }
-    S.cl.id='';S.cl.key='';S.cl.name='';S.cl.phone='';S.cl.note='';toast('Clienta guardada');render();
-  }catch(e){fail(e)}
-}
-function clientRow(p){
-  const mine=S.bookings.filter(b=>pkey(b.name,b.phone)===p.key),t=ymd(new Date());
-  const next=mine.filter(b=>b.d>=t&&act(b)).sort(cmp)[0];
-  const cups=S.cups.filter(c=>pkey(c.name,c.phone)===p.key).map(c=>'cuponera '+cupUsed(c).length+'/'+c.total);
-  const bits=[p.phone?esc(p.phone):'sin WhatsApp',mine.length+(mine.length===1?' turno':' turnos')];
-  if(next)bits.push('próximo: '+esc(fmtDay(next.d))+' '+next.t);
-  cups.forEach(x=>bits.push(esc(x)));
-  const ph=waPhone(p.phone);
-  return '<div class="item"><div class="row"><div><strong>'+esc(p.name)+'</strong><div class="small">'+bits.join(' · ')+'</div>'+(p.note?'<div class="small">'+esc(p.note)+'</div>':'')+'</div>'+
-    '<div class="acts">'+(ph?'<a class="btn sm ghost" target="_blank" rel="noopener" href="'+esc(wa(ph,'Hola '+first(p.name)+'!'))+'">WhatsApp</a>':'')+
-    '<button class="btn sm ghost" type="button" data-a="cledit" data-k="'+esc(p.key)+'">Editar</button>'+
-    (p.doc?'<button class="btn sm plain" type="button" data-a="cldel" data-id="'+esc(p.id)+'">Eliminar</button>':'')+'</div></div></div>';
-}
-function clList(){
-  const q=norm(S.cl.q).trim(),qd=String(S.cl.q||'').replace(/\D/g,'');
-  const list=people().filter(p=>!q||norm(p.name).indexOf(q)>=0||(qd.length>=3&&(waPhone(p.phone).indexOf(qd)>=0||waPhone(p.phone).indexOf(qd.replace(/^0/,''))>=0))).sort((a,b)=>a.name.localeCompare(b.name,'es'));
-  return list.length?list.map(clientRow).join(''):'<p class="small" style="margin:0">'+(S.cl.q?'No encontré a nadie con ese nombre.':'Todavía no hay clientas. Se guardan solas cuando cargás un turno, una cuponera o una espera. También podés agregarlas acá.')+'</p>';
-}
-function tabClientas(){
-  const c=S.cl,editing=!!(c.id||c.key);
-  const form='<section class="card"><h3>'+(editing?'Editar clienta':'Agregar clienta')+'</h3>'+
-  '<div class="formgrid"><label class="field">Nombre y apellido<input id="cl-name" autocomplete="off" value="'+esc(c.name)+'"></label><label class="field">WhatsApp<input id="cl-phone" type="tel" value="'+esc(c.phone)+'"></label></div>'+
-  '<label class="field">Notas (opcional, solo las ves vos)<input id="cl-note" value="'+esc(c.note)+'"></label>'+
-  '<div class="acts"><button class="btn" type="button" data-a="clsave">Guardar</button>'+(editing?'<button class="btn ghost" type="button" data-a="clcancel">Cancelar</button>':'')+'</div></section>';
-  return form+inactiveBlock()+'<section class="card"><h3>Mis clientas</h3><label class="field">Buscar<input id="cl-q" autocomplete="off" placeholder="Nombre o teléfono" value="'+esc(c.q)+'"></label><div id="cl-list">'+clList()+'</div></section>';
-}
-
-/* ---------- Seguimiento, renovaciones, cambios, inactivas, resumen ---------- */
-function fuMsg(b){return 'Hola '+first(b.name)+'! ¿Cómo te sentiste después de tu '+svcName(b.svc).toLowerCase()+'? Cualquier cosa me avisás. Si te gustó, me ayuda mucho que me recomiendes o me sigas en Instagram: @habita_terapias '+IG+' ¡Gracias por confiar en mí!'}
-function fuBlock(){
-  const from=ymd(addDays(new Date(),-7));
-  const list=S.bookings.filter(b=>b.st==='done'&&!b.fu&&b.d>=from).sort(cmp);
-  return '<section class="card"><h3>Seguimiento después de la sesión</h3>'+(list.length?list.map(b=>{
-    const ph=waPhone(b.phone);
-    return '<div class="item"><div class="row"><div><strong>'+esc(b.name)+'</strong><div class="small">'+esc(svcName(b.svc))+' · '+esc(fmtDay(b.d))+'</div></div><div class="row">'+
-      (ph?'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(ph,fuMsg(b)))+'">Mandar seguimiento</a>':'<span class="small">Sin teléfono</span>')+
-      '<label class="chk"><input type="checkbox" data-a="rem" data-id="'+b.id+'" data-f="fu"'+(b.fu?' checked':'')+'> Enviado</label></div></div></div>';
-  }).join(''):'<p class="small" style="margin:0">No hay seguimientos pendientes. Aparecen cuando marcás una sesión como realizada.</p>')+'</section>';
-}
-function renewMsg(c,left){return 'Hola '+first(c.name)+'! '+(left>0?'Te queda '+left+' sesión en tu cuponera.':'Terminaste tu cuponera.')+' Si querés renovarla, tengo: '+PACKS.map(x=>x.label+' '+money(x.price)).join(', ')+'. Consultame por promos activas. ¡Gracias!'}
-function renewBlock(){
-  const list=S.cups.filter(c=>c.total-cupUsed(c).length===1);
-  return '<section class="card"><h3>Cuponeras por terminar</h3>'+(list.length?list.map(c=>{
-    const ph=waPhone(c.phone);
-    return '<div class="item"><div class="row"><div><strong>'+esc(c.name)+'</strong><div class="small">Le queda 1 sesión de '+c.total+'</div></div>'+(ph?'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(ph,renewMsg(c,1)))+'">Ofrecer renovación</a>':'<span class="small">Sin teléfono</span>')+'</div></div>';
-  }).join(''):'<p class="small" style="margin:0">Ninguna cuponera está por terminar.</p>')+'</section>';
-}
-function mvForm(b){
-  const m=S.mv;
-  return '<div class="note"><div class="formgrid"><label class="field">Nuevo día<input id="mv-d" type="date" value="'+esc(m.d)+'"></label><label class="field">Nueva hora<select id="mv-t">'+TIMES.slice(0,-1).map(x=>'<option'+(x===m.t?' selected':'')+'>'+x+'</option>').join('')+'</select></label></div>'+
-    '<div class="acts" style="margin-top:8px"><button class="btn sm" type="button" data-a="mvsave">Guardar cambio</button><button class="btn sm ghost" type="button" data-a="mvcancel">Cancelar</button></div></div>';
-}
-async function moveBooking(){
-  const m=S.mv,b=S.bookings.find(x=>x.id===m.id);if(!b)return;
-  if(!m.d||!m.t){toast('Elegí el día y la hora');return}
-  const s=mins(m.t),du=dur(b.svc);
-  if(S.bookings.some(o=>o.id!==b.id&&act(o)&&o.d===m.d&&s<mins(o.t)+dur(o.svc)&&s+du>mins(o.t))){toast('Ese horario se pisa con otro turno');return}
-  if(S.blocks.some(x=>x.d===m.d&&s<mins(x.to)&&s+du>mins(x.from))){toast('Ese horario está bloqueado');return}
-  try{await S.db.collection('bookings').doc(b.id).update({d:m.d,t:m.t,rem1:false,rem0:false});S.mv.id='';toast('Turno cambiado. Avisale por WhatsApp.');render()}catch(e){fail(e)}
-}
-function lastVisit(p){
-  const t=ymd(new Date());
-  const v=S.bookings.filter(b=>pkey(b.name,b.phone)===p.key&&(b.st==='done'||b.st==='cobr'||(b.st==='conf'&&b.d<t))).map(b=>b.d).sort();
-  return v.length?v[v.length-1]:'';
-}
-function inactive(){
-  const t=ymd(new Date());
-  return people().map(p=>({p:p,last:lastVisit(p)})).filter(x=>x.last&&Math.floor((today0()-parseD(x.last))/864e5)>=30&&waPhone(x.p.phone)&&!S.bookings.some(b=>pkey(b.name,b.phone)===x.p.key&&act(b)&&b.d>=t)).sort((a,b)=>b.last.localeCompare(a.last));
-}
-function inactiveBlock(){
-  const list=inactive().slice(0,12);
-  return '<section class="card"><h3>Hace más de 30 días que no vienen</h3>'+(list.length?list.map(x=>{
-    const days=Math.floor((today0()-parseD(x.last))/864e5);
-    return '<div class="item"><div class="row"><div><strong>'+esc(x.p.name)+'</strong><div class="small">Última sesión: '+esc(fmtDay(x.last))+' (hace '+days+' días)</div></div><a class="btn sm" target="_blank" rel="noopener" href="'+esc(wa(waPhone(x.p.phone),'Hola '+first(x.p.name)+'! Hace un tiempo que no nos vemos. ¿Te gustaría volver a reservar? Avisame y te paso los horarios disponibles. ¡Un abrazo!'))+'">Escribirle</a></div></div>';
-  }).join(''):'<p class="small" style="margin:0">Nadie por ahora. Acá aparecen las clientas con más de 30 días desde su última sesión.</p>')+'</section>';
-}
-const monthOf=s=>String(s).slice(0,7);
-function tabResumen(){
-  const ym=S.sm,q=ym.split('-').map(Number),title=MONTHS[q[1]-1]+' '+q[0];
-  const mine=S.bookings.filter(b=>monthOf(b.d)===ym),t0=ymd(new Date());
-  const hecha=mine.filter(b=>b.st==='done'||b.st==='cobr');
-  const ind=hecha.filter(b=>b.kind!=='cup'),cupS=hecha.filter(b=>b.kind==='cup');
-  const price=b=>svcOf(b.svc).price;
-  const incInd=ind.reduce((a,b)=>a+price(b),0);
-  const sold=S.cups.filter(c=>monthOf(ymd(new Date(c.created||0)))===ym);
-  const incCup=sold.reduce((a,c)=>a+(Number(c.price)||0),0);
-  const sena=mine.filter(b=>b.st==='conf'&&b.kind!=='cup').reduce((a,b)=>a+Math.round(price(b)/2),0);
-  const sin=mine.filter(b=>b.st==='conf'&&b.d<t0).length;
-  const canc=mine.filter(b=>b.st==='canc').length,cobr=mine.filter(b=>b.st==='cobr').length;
-  const by=SERVICES.map(s=>({s:s,n:hecha.filter(b=>b.svc===s.id).length})).filter(x=>x.n>0);
-  const mx=Math.max.apply(null,[1].concat(by.map(x=>x.n)));
-  const kv=(l,v,c)=>'<div class="kv'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b></div>';
-  return '<div class="bar"><button class="iconb" type="button" data-a="smon" data-v="-1" aria-label="Mes anterior">‹</button><strong style="text-transform:capitalize">'+title+'</strong><button class="iconb" type="button" data-a="smon" data-v="1" aria-label="Mes siguiente">›</button></div>'+
-  (sin?'<p class="note">Tenés '+sin+(sin===1?' turno pasado':' turnos pasados')+' sin marcar como realizados. Marcalos en Turnos para que cuenten acá.</p>':'')+
-  '<section class="card"><h3>Ingresos</h3>'+kv('Sesiones individuales ('+ind.length+')',money(incInd))+kv('Cuponeras vendidas ('+sold.length+')',money(incCup))+kv('Total del mes',money(incInd+incCup),'tot')+
-  (sena?'<p class="small" style="margin:0">Además hay '+money(sena)+' de señas de turnos confirmados que todavía no se realizaron.</p>':'')+'</section>'+
-  '<section class="card"><h3>Sesiones</h3>'+kv('Realizadas',String(hecha.length))+kv('De cuponera',String(cupS.length))+kv('Canceladas sin cargo',String(canc))+kv('Canceladas con cobro',String(cobr))+
-  (by.length?'<div style="display:grid;gap:10px;margin-top:4px">'+by.map(x=>'<div><div class="row"><span>'+esc(x.s.name)+'</span><b>'+x.n+'</b></div><div class="bar-prog"><i style="width:'+Math.round(x.n/mx*100)+'%"></i></div></div>').join('')+'</div>':'<p class="small" style="margin:0">Todavía no hay sesiones realizadas este mes.</p>')+'</section>';
-}
-
-/* ---------- Render y eventos ---------- */
-function render(){
+function render(keep){
   const y=window.scrollY;
-  app.innerHTML='<div class="wrap'+(S.view==='panel'?' wide':'')+'">'+(S.view==='panel'?panelView():clientView())+'</div>';
-  window.scrollTo(0,y);
+  app.innerHTML=view();
+  if(keep)window.scrollTo(0,y);
 }
-let pending=false;
-function typing(){const a=document.activeElement;return !!(a&&app.contains(a)&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)&&a.type!=='checkbox')}
-function rr(){if(typing()){pending=true;return}render()}
-let tt;
-function toast(m){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=m;el.className='show';clearTimeout(tt);tt=setTimeout(()=>{el.className=''},3200)}
-function goto(id){const el=document.getElementById(id);if(el){const rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;el.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'})}}
-function refreshCta(){const a=$('#cta');if(!a)return;const c=ctaState();a.setAttribute('href',c.href);a.setAttribute('aria-disabled',c.ok?'false':'true')}
-function refreshWl(){const st=wlState(),a=$('#wcta');if(!a)return;a.setAttribute('href',st.href);a.setAttribute('aria-disabled',st.ok?'false':'true')}
-function refreshCancel(){const st=cancelState(),m=$('#cmsg'),a=$('#ccta');if(!m||!a)return;m.textContent=st.msg;m.hidden=!st.msg;a.setAttribute('href',st.href);a.setAttribute('aria-disabled',st.ok?'false':'true')}
-const GROUPS={f:S.form,c:S.cancel,nb:S.nb,nc:S.nc,bl:S.bl,w:S.wl,nw:S.nw,cl:S.cl,mv:S.mv};
-function field(e){
-  const id=e.target.id||'',i=id.indexOf('-');if(i<0)return false;
-  const g=GROUPS[id.slice(0,i)];if(!g)return false;
-  g[id.slice(i+1)]=e.target.type==='checkbox'?e.target.checked:e.target.value;return id.slice(0,i);
+function updCta(){const c=ctaState(),a=$('#cta');if(a){a.href=c.href;a.setAttribute('aria-disabled',c.ok?'false':'true')}}
+function updCancel(){const st=cancelState(),m=$('#cmsg'),a=$('#ccta');if(m){m.hidden=!st.msg;m.textContent=st.msg}if(a){a.href=st.href;a.setAttribute('aria-disabled',st.ok?'false':'true')}}
+const G={f:S.form,c:S.cancel};
+function onField(e){
+  const t=e.target,g=t.getAttribute&&t.getAttribute('data-g');
+  if(!g)return;
+  G[g][t.getAttribute('data-k')]=t.value;
+  if(g==='f')updCta();else updCancel();
 }
-app.addEventListener('input',e=>{
-  const g=field(e);if(g==='f')refreshCta();else if(g==='c')refreshCancel();else if(g==='w')refreshWl();
-  const id=e.target.id||'';
-  if(id==='nb-name'||id==='nw-name'||id==='nc-name')showSug(id.slice(0,2),e.target.value);
-  else if(id==='cl-q'){const el=$('#cl-list');if(el)el.innerHTML=clList()}
-});
-if(document.addEventListener)document.addEventListener('click',e=>{if(!e.target.closest('.sug')&&!/-name$/.test(e.target.id||''))document.querySelectorAll('.sug').forEach(x=>{x.hidden=true})});
-app.addEventListener('change',e=>{
-  const g=field(e);if(!g)return;
-  if(g==='f')refreshCta();else if(g==='c')refreshCancel();else if(g==='w')refreshWl();
-  else if(e.target.id==='nb-type'&&S.nb.type!=='suelta'){const c=S.cups.find(x=>x.id===S.nb.type);if(c){S.nb.name=c.name;S.nb.phone=c.phone||''}render()}
-  else if(e.target.id==='nc-pack'){const pk=PACKS.find(x=>x.id===S.nc.pack);if(pk){S.nc.total=String(pk.total);S.nc.price=String(pk.price)}render()}
-  else if(e.target.id==='nb-svc'){const cc=S.cups.find(x=>x.id===S.nb.type);if(cc&&cc.only&&cc.only!==S.nb.svc)S.nb.type='suelta';render()}
-  else if(e.target.id==='bl-from'){if(mins(S.bl.to)<=mins(S.bl.from))S.bl.to=hhmm(Math.min(mins(S.bl.from)+60,20*60));render()}
-});
-app.addEventListener('toggle',e=>{if(e.target.id==='cdet')S.cancelOpen=e.target.open;else if(e.target.id==='wdet')S.wlOpen=e.target.open},true);
-app.addEventListener('focusout',()=>{if(pending)setTimeout(()=>{if(!typing()){pending=false;render()}},60)});
+app.addEventListener('input',onField);
+app.addEventListener('change',onField);
+app.addEventListener('toggle',e=>{if(e.target.id==='cdet')S.cancelOpen=e.target.open},true);
 app.addEventListener('click',e=>{
-  const b=e.target.closest('[data-a]');if(!b||!app.contains(b))return;
-  const a=b.dataset.a,v=b.dataset.v,id=b.dataset.id;
-  if(a==='sent'){if(b.getAttribute('aria-disabled')==='true'){e.preventDefault();toast('Completá tu nombre y tu WhatsApp');return}S.sent=true;setTimeout(render,80);return}
-  if(a==='wl'){if(b.getAttribute('aria-disabled')==='true'){e.preventDefault();toast('Completá tu nombre y tu WhatsApp');return}toast('Se abrió WhatsApp con tu pedido.');return}
-  if(a==='rem'){upd(id,{[b.dataset.f]:b.checked});return}
-  if(a==='svc'){S.svc=v;if(S.day&&S.time&&!slotsFor(S.day,null,dur(v)).includes(S.time))S.time=null;S.wlTime=null;S.sent=false;render();goto('s2')}
-  else if(a==='mon'){S.month=new Date(S.month.getFullYear(),S.month.getMonth()+Number(v),1);render()}
-  else if(a==='day'){S.day=v;S.time=null;S.wlTime=null;S.sent=false;render();goto('slots')}
-  else if(a==='time'){S.time=v;S.sent=false;render();goto('s3')}
-  else if(a==='kind'){S.form.kind=v;render()}
-  else if(a==='first'){S.form.first=v;render()}
-  else if(a==='busy'){S.wlTime=S.wlTime===v?null:v;S.wlOpen=true;render();goto('wdet')}
-  else if(a==='wlclear'){S.wlTime=null;render()}
-  else if(a==='reset'){S.svc=null;S.day=null;S.time=null;S.sent=false;S.form.note='';render();window.scrollTo(0,0)}
-  else if(a==='view'){S.view=v;render();window.scrollTo(0,0)}
-  else if(a==='tab'){S.tab=v;render()}
-  else if(a==='blmode'){S.bl.all=v==='day';render()}
-  else if(a==='mv'){const bk=S.bookings.find(x=>x.id===id);if(bk){S.mv.id=id;S.mv.d=bk.d;S.mv.t=bk.t;render()}}
-  else if(a==='mvsave')moveBooking();
-  else if(a==='mvcancel'){S.mv.id='';render()}
-  else if(a==='smon'){const q=S.sm.split('-').map(Number),d=new Date(q[0],q[1]-1+Number(v),1);S.sm=d.getFullYear()+'-'+pad(d.getMonth()+1);render()}
-  else if(a==='cx'){S.cancelId=S.cancelId===id?null:id;render()}
-  else if(a==='st'){S.cancelId=null;upd(id,{st:b.dataset.s});if(b.dataset.s==='done')toast('Realizada. El mensaje de seguimiento queda en Recordatorios.')}
-  else if(a==='del'){S.db.collection('bookings').doc(id).delete().catch(fail)}
-  else if(a==='delc'){if(S.bookings.some(x=>x.cup===id)){toast('Esa cuponera tiene turnos. Cancelalos primero.');return}S.db.collection('cups').doc(id).delete().catch(fail)}
-  else if(a==='delbl'){S.db.collection('blocks').doc(id).delete().catch(fail)}
-  else if(a==='addb')addBooking();
-  else if(a==='addc')addCup();
-  else if(a==='addbl')addBlock();
-  else if(a==='addw')addWait();
-  else if(a==='pick')pickClient(b.dataset.g,b.dataset.k);
-  else if(a==='cledit')editClient(b.dataset.k);
-  else if(a==='cldel'){S.db.collection('clients').doc(id).delete().catch(fail)}
-  else if(a==='clsave')saveClientForm();
-  else if(a==='clcancel'){S.cl.id='';S.cl.key='';S.cl.name='';S.cl.phone='';S.cl.note='';render()}
-  else if(a==='delw'){S.db.collection('wait').doc(id).delete().catch(fail)}
-  else if(a==='give')giveTurn(id,v);
-  else if(a==='publish')publish();
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const a=b.getAttribute('data-a'),v=b.getAttribute('data-v');
+  if(a==='svc'){
+    S.svc=v;
+    if(S.day&&!dayOpen(S.day)){S.day=null;S.time=null}
+    else if(S.time&&slotsFor(S.day,curDur()).indexOf(S.time)<0)S.time=null;
+    S.sent=false;render(true);
+    const s2=$('#s2');if(s2&&s2.scrollIntoView)s2.scrollIntoView({behavior:'smooth',block:'start'});
+  }else if(a==='mon'){S.month=new Date(S.month.getFullYear(),S.month.getMonth()+Number(v),1);render(true)}
+  else if(a==='day'){S.day=v;S.time=null;S.sent=false;render(true);const sl=$('#slots');if(sl&&sl.scrollIntoView)sl.scrollIntoView({behavior:'smooth',block:'nearest'})}
+  else if(a==='time'){S.time=v;S.sent=false;render(true);const s3=$('#s3');if(s3&&s3.scrollIntoView)s3.scrollIntoView({behavior:'smooth',block:'start'})}
+  else if(a==='kind'){S.form.kind=v;render(true)}
+  else if(a==='first'){S.form.first=v;render(true)}
+  else if(a==='sent'){if(b.getAttribute('aria-disabled')==='true'){e.preventDefault();return}setTimeout(()=>{S.sent=true;render(true)},400)}
+  else if(a==='reset'){S.svc=null;S.day=null;S.time=null;S.sent=false;S.form.note='';S.form.health='';S.form.weeks='';render();window.scrollTo(0,0)}
 });
-function fail(e){toast(e&&e.code==='invalid_argument'?'No tenés permiso para guardar cambios.':'No se pudo guardar. Probá de nuevo.')}
-function upd(id,d){return S.db.collection('bookings').doc(id).update(d).catch(fail)}
-async function addBooking(){
-  const f=S.nb;
-  if(!f.name.trim()||!f.d||!f.t){toast('Completá nombre, día y hora');return}
-  const k=f.d,s=mins(f.t);
-  const du=dur(f.svc);
-  if(S.bookings.some(b=>act(b)&&b.d===k&&s<mins(b.t)+dur(b.svc)&&s+du>mins(b.t))){toast('Ese horario se pisa con otro turno');return}
-  const cup=f.type!=='suelta';
-  try{
-    await S.db.collection('bookings').add({name:f.name.trim(),phone:f.phone.trim(),svc:f.svc,d:f.d,t:f.t,kind:cup?'cup':'suelta',cup:cup?f.type:null,st:cup?'conf':'pend',rem1:false,rem0:false,created:Date.now()});
-    saveClient(f.name,f.phone);
-    S.nb.name='';S.nb.phone='';S.nb.type='suelta';toast('Turno guardado');render();
-  }catch(e){fail(e)}
-}
-async function addCup(){
-  const f=S.nc,n=Number(f.total);
-  if(!f.name.trim()||!(n>=1&&n<=50)){toast('Completá el nombre y la cantidad de sesiones');return}
-  try{await S.db.collection('cups').add({name:f.name.trim(),phone:f.phone.trim(),total:Math.round(n),price:Math.max(0,Number(f.price)||0),pack:f.pack,only:(PACKS.find(x=>x.id===f.pack)||{only:''}).only,created:Date.now()});saveClient(f.name,f.phone);S.nc.name='';S.nc.phone='';toast('Cuponera creada');render()}catch(e){fail(e)}
-}
-async function addBlock(){
-  const f=S.bl;if(!f.d){toast('Elegí el día');return}
-  const from=f.all?'00:00':f.from,to=f.all?'24:00':f.to;
-  if(mins(to)<=mins(from)){toast('La hora final tiene que ser después de la inicial');return}
-  try{await S.db.collection('blocks').add({d:f.d,from,to,note:f.note.trim(),created:Date.now()});S.bl.note='';const clash=S.bookings.some(b=>act(b)&&b.d===f.d&&mins(b.t)<mins(to)&&mins(b.t)+dur(b.svc)>mins(from));toast(clash?'Bloqueo guardado. Ojo: ya hay un turno en ese horario.':'Bloqueo guardado');render()}catch(e){fail(e)}
-}
-function buildDoc(pub){
-  const css=$('#st').textContent,code=$('#code').textContent;
-  const json=JSON.stringify(pub).replace(/</g,'\\u003c');
-  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'+
-    HEAD+'<style id="st">'+css+'</style><div id="app"></div><script type="application/json" id="pub">'+json+'</'+'script><script id="code">'+code+'</'+'script></body></html>';
-}
-async function publish(){
-  const art=await window.claude.use('artifact');
-  if(!art){toast('Desde acá no se puede publicar.');return}
-  const p=payload();
-  try{await art.publish(buildDoc({taken:p.taken,blocks:p.blocks,updated:new Date().toISOString()}));toast('Horarios publicados')}
-  catch(e){toast(e&&e.code==='conflict'?'Se actualizó la página. Probá de nuevo.':'No se pudo publicar. Probá de nuevo.')}
-}
-function watch(name,key){
-  S.db.collection(name).onSnapshot(snap=>{
-    S[key]=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
-    if(!snap.metadata.fromCache)S.ready[key]=true;
-    rr();
-  },()=>{S.ready[key]=false;rr()});
-}
 render();
-(async()=>{
-  try{
-    if(!window.claude||!window.claude.use)return;
-    const user=await window.claude.use('user');
-    if(!user||!(await user.isOwner()))return;
-    S.owner=true;render();
-    S.db=await window.claude.use('db');
-    if(S.db){watch('bookings','bookings');watch('blocks','blocks');watch('cups','cups');watch('wait','wait');watch('clients','clients')}
-  }catch(e){}
-})();
+
 })();
 </script>
-
-</body></html>
+</body>
+</html>
