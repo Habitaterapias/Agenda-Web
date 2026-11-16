@@ -289,12 +289,13 @@ function view(){
   return '<div class="wrap"><header class="brand">'+lotus()+'<h1>Hábita</h1><div class="tag">Cuerpo, energía y alma</div></header>'+
   '<p class="lead"><b style="font-family:var(--serif);font-weight:500;font-size:24px;color:var(--ink);display:block;line-height:1.2;margin-bottom:6px">Bienvenida a Hábita</b>Acá podés reservar tu momento de cuidado. Elegí tu sesión, el día y el horario que te gustaría, y yo te confirmo por WhatsApp.</p>'+
   '<a class="btn" style="align-self:stretch;flex-direction:column;gap:2px;padding:10px 22px;border-radius:22px;line-height:1.25" href="'+esc(wa(WA,'Hola! Tengo una consulta sobre Hábita.'))+'" target="_blank" rel="noopener"><span>¿Tenés alguna consulta?</span><span style="font-weight:500;font-size:14px">Escribime por WhatsApp tocando aquí</span></a>'+
+  stepServicio()+stepDia()+stepDatos()+cancelBox()+
+  '<section class="step"><div class="sh"><h2>Cómo funciona</h2></div>'+
   '<dl class="rules">'+
-    '<div><dt>Precio</dt><dd>Sesión individual: '+money(1000)+'. Masaje para embarazadas: '+money(1500)+'.</dd></div>'+
     '<div><dt>Seña</dt><dd>Las sesiones individuales se confirman con una seña del 50% ('+money(500)+'; '+money(750)+' en el masaje para embarazadas). Con cuponera no hace falta.</dd></div>'+
     '<div><dt>Cancelación</dt><dd>Podés cancelar o cambiar tu turno sin costo hasta 24 horas antes. De lo contrario se cobra la sesión.</dd></div>'+
     '<div><dt>Cuponeras</dt><dd>'+PACKS.map(x=>x.label+': '+money(x.price)).join(' · ')+'. Consultá por promos activas. En cada turno te aviso qué sesión de tu cuponera es.</dd></div>'+
-  '</dl>'+stepServicio()+stepDia()+stepDatos()+cancelBox()+
+  '</dl>'+'</section>'+
   '<footer class="foot"><p>Atiendo de lunes a viernes, de 8:00 a 20:00 (miércoles y viernes hasta las 19:00).</p><p>Estoy en Lagomar Sur.</p><p><a href="'+IG+'" target="_blank" rel="noopener">@habita_terapias en Instagram</a></p></footer></div>';
 }
 function render(keep){
