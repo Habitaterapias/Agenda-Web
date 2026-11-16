@@ -46,7 +46,8 @@ h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0;text-wrap:balance}
 .step{display:flex;flex-direction:column;gap:12px;scroll-margin-top:12px}
 .step[data-locked="1"]{opacity:.45;pointer-events:none}
 .sh{display:flex;align-items:center;gap:10px}
-.sh h2{font-size:28px}
+.sh h2{font-size:32px;line-height:1.1}
+.hint{margin:-6px 0 0;font-size:14px;color:var(--muted)}
 .num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--terra);color:var(--terra-text);display:grid;place-items:center;font-size:14px;font-weight:600;flex:none}
 .step[data-done="1"] .num{background:var(--terra);color:var(--terra-ink)}
 .svc{display:grid;gap:8px}
@@ -202,7 +203,7 @@ function dayOpen(k){
 }
 
 function stepServicio(){
-  return '<section class="step" id="s1" data-done="'+(S.svc?1:0)+'"><div class="sh"><span class="num">1</span><h2>Tu sesión</h2></div><div class="svc">'+
+  return '<section class="step" id="s1" data-done="'+(S.svc?1:0)+'"><div class="sh"><span class="num">1</span><h2>¿Qué servicio querés agendar?</h2></div><p class="hint">Tocá el que quieras.</p><div class="svc">'+
   SERVICES.map(s=>'<button class="opt big" type="button" data-a="svc" data-v="'+s.id+'" aria-pressed="'+(S.svc===s.id)+'"><span class="top"><span>'+esc(s.name)+'</span><small>'+durTxt(s.dur)+' · '+money(s.price)+'</small></span>'+(s.desc?'<span class="desc">'+esc(s.desc)+'</span>':'')+'</button>').join('')+'</div></section>';
 }
 function stepDia(){
@@ -224,7 +225,7 @@ function stepDia(){
       (hs.length?'<div class="slots">'+hs.map(h=>'<button class="slot" type="button" data-a="time" data-v="'+h+'" aria-pressed="'+(S.time===h)+'">'+h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
       '<p class="legend">Elegí el horario que más te guste. Yo te confirmo la disponibilidad por WhatsApp.</p></div>';
   }
-  return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>Día y horario</h2></div>'+
+  return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>¿Qué día y a qué hora?</h2></div><p class="hint">Tocá un día y después un horario.</p>'+
   '<div class="cal"><div class="calh"><button class="iconb" type="button" data-a="mon" data-v="-1" aria-label="Mes anterior"'+(prevOk?'':' disabled')+'>‹</button><strong>'+MONTHS[m.getMonth()]+' '+m.getFullYear()+'</strong><button class="iconb" type="button" data-a="mon" data-v="1" aria-label="Mes siguiente"'+(nextOk?'':' disabled')+'>›</button></div>'+
   '<div class="grid7">'+['L','M','M','J','V','S','D'].map(x=>'<span class="wd">'+x+'</span>').join('')+cells+'</div></div>'+slots+'</section>';
 }
