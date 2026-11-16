@@ -185,7 +185,7 @@ const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
 const S={svc:null,day:null,time:null,month:new Date(today0().getFullYear(),today0().getMonth(),1),
   form:{name:'',phone:'',kind:'suelta',note:'',weeks:'',first:'',health:''},sent:false,
   cancel:{name:'',d:'',t:'10:00'},cancelOpen:false};
-function rule(d){const w=d.getDay();if(w===0||w===6)return null;return{first:8*60,close:(w===3||w===5)?19*60:20*60}}
+function rule(d){const w=d.getDay();if(w===0||w===6)return null;return{first:8*60,close:19*60}}
 function slotsFor(k,du){
   const d=parseD(k),r=rule(d);if(!r)return[];
   const now=new Date(),out=[];
@@ -296,7 +296,7 @@ function view(){
     '<div><dt>Cancelación</dt><dd>Podés cancelar o cambiar tu turno sin costo hasta 24 horas antes. De lo contrario se cobra la sesión.</dd></div>'+
     '<div><dt>Cuponeras</dt><dd>'+PACKS.map(x=>x.label+': '+money(x.price)).join(' · ')+'. Consultá por promos activas. En cada turno te aviso qué sesión de tu cuponera es.</dd></div>'+
   '</dl>'+'</section>'+
-  '<footer class="foot"><p>Atiendo de lunes a viernes, de 8:00 a 20:00 (miércoles y viernes hasta las 19:00).</p><p>Estoy en Lagomar Sur.</p><p><a href="'+IG+'" target="_blank" rel="noopener">@habita_terapias en Instagram</a></p></footer></div>';
+  '<footer class="foot"><p>Atiendo de lunes a viernes, de 8:00 a 19:00.</p><p>Estoy en Lagomar Sur.</p><p><a href="'+IG+'" target="_blank" rel="noopener">@habita_terapias en Instagram</a></p></footer></div>';
 }
 function render(keep){
   const y=window.scrollY;
