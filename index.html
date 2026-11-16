@@ -231,7 +231,7 @@ function stepDia(){
 function reqMsg(){
   const f=S.form;
   return ['Hola! Quiero pedir un turno en Hábita.','Sesión: '+svcName(S.svc),'Día y hora que me gustaría: '+fmtDay(S.day)+', '+S.time+' ('+durTxt(curDur())+')','Nombre: '+f.name.trim(),'WhatsApp: '+f.phone.trim(),
-    f.kind==='cup'?'Tengo cuponera.':'Sesión individual ('+money(svcOf(S.svc).price)+'): abono la seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+') para confirmar el turno.',
+    f.kind==='cup'?'Tengo cuponera.':'Sesión individual ('+money(svcOf(S.svc).price)+'): voy a transferir la seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+') a la cuenta Midinero Nº 1346663, a nombre de María Mercedes Souto, y te mando el comprobante.',
     f.first==='si'?'Es mi primera vez en Hábita.':f.first==='no'?'Ya vine antes.':'',
     f.first==='si'&&f.health.trim()?'Salud: '+f.health.trim():'',
     S.svc==='emb'&&f.weeks.trim()?'Semanas de embarazo: '+f.weeks.trim():'',
@@ -252,7 +252,7 @@ function stepDatos(){
   return '<section class="step" id="s3" data-locked="'+(locked?1:0)+'"><div class="sh"><span class="num">3</span><h2>Tus datos</h2></div>'+
   (S.time?'<div class="sum"><b>'+esc(svcName(S.svc))+'</b><span>'+esc(fmtDay(S.day))+' a las '+S.time+' · '+durTxt(curDur())+'</span></div>':'')+
   '<div class="seg"><button class="opt" type="button" data-a="kind" data-v="suelta" aria-pressed="'+(f.kind==='suelta')+'">Sesión individual</button><button class="opt" type="button" data-a="kind" data-v="cup" aria-pressed="'+(f.kind==='cup')+'">Tengo cuponera</button></div>'+
-  '<p class="note">'+(f.kind==='suelta'?'Para confirmar el turno se abona una seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+'). Cuando te confirme la disponibilidad te paso los datos para transferirla.':'No hace falta seña. Te aviso qué sesión de tu cuponera es.')+'</p>'+
+  '<p class="note">'+(f.kind==='suelta'?'Para confirmar el turno se abona una seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+'). Transferila a la cuenta Midinero Nº 1346663, a nombre de María Mercedes Souto, y mandame el comprobante por WhatsApp.':'No hace falta seña. Te aviso qué sesión de tu cuponera es.')+'</p>'+
   '<label class="field">Nombre<input id="f-name" data-g="f" data-k="name" autocomplete="name" value="'+esc(f.name)+'"></label>'+
   '<label class="field">WhatsApp<input id="f-phone" data-g="f" data-k="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="'+esc(f.phone)+'"></label>'+
   '<div class="field">¿Es tu primera vez en Hábita?<div class="seg"><button class="opt" type="button" data-a="first" data-v="si" aria-pressed="'+(f.first==='si')+'">Sí</button><button class="opt" type="button" data-a="first" data-v="no" aria-pressed="'+(f.first==='no')+'">Ya vine antes</button></div></div>'+
