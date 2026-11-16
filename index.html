@@ -231,7 +231,7 @@ function stepDia(){
 }
 function reqMsg(){
   const f=S.form;
-  return ['Hola! Quiero pedir un turno en Hábita.','Sesión: '+svcName(S.svc),'Día y hora que me gustaría: '+fmtDay(S.day)+', '+S.time+' ('+durTxt(curDur())+')','Nombre: '+f.name.trim(),'WhatsApp: '+f.phone.trim(),
+  return ['Hola! Quiero pedir un turno en Hábita.','Sesión: '+svcName(S.svc),'Día y hora que me gustaría: '+fmtDay(S.day)+', '+S.time+' ('+durTxt(curDur())+')','Nombre y apellido: '+f.name.trim(),'WhatsApp: '+f.phone.trim(),
     f.kind==='cup'?'Tengo cuponera.':'Sesión individual ('+money(svcOf(S.svc).price)+'): voy a transferir la seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+') a la cuenta Midinero Nº 1346663, a nombre de María Mercedes Souto, y te mando el comprobante.',
     f.first==='si'?'Es mi primera vez en Hábita.':f.first==='no'?'Ya vine antes.':'',
     f.first==='si'&&f.health.trim()?'Salud: '+f.health.trim():'',
@@ -239,7 +239,7 @@ function reqMsg(){
     f.note.trim()?'Nota: '+f.note.trim():'',
     'Quedo atenta a tu confirmación.'].filter(Boolean).join('\n');
 }
-function ctaState(){const f=S.form;const ok=f.name.trim().length>1&&f.phone.replace(/\D/g,'').length>=8&&S.svc&&S.day&&S.time;return{ok:!!ok,href:ok?wa(WA,reqMsg()):'#'}}
+function ctaState(){const f=S.form;const ok=f.name.trim().split(/\s+/).length>=2&&f.phone.replace(/\D/g,'').length>=8&&S.svc&&S.day&&S.time;return{ok:!!ok,href:ok?wa(WA,reqMsg()):'#'}}
 function stepDatos(){
   const f=S.form,locked=!S.time;
   if(S.sent&&!locked){
@@ -254,13 +254,13 @@ function stepDatos(){
   (S.time?'<div class="sum"><b>'+esc(svcName(S.svc))+'</b><span>'+esc(fmtDay(S.day))+' a las '+S.time+' · '+durTxt(curDur())+'</span></div>':'')+
   '<div class="seg"><button class="opt" type="button" data-a="kind" data-v="suelta" aria-pressed="'+(f.kind==='suelta')+'">Sesión individual</button><button class="opt" type="button" data-a="kind" data-v="cup" aria-pressed="'+(f.kind==='cup')+'">Tengo cuponera</button></div>'+
   '<p class="note">'+(f.kind==='suelta'?'Para confirmar el turno se abona una seña del 50% ('+money(Math.round(svcOf(S.svc).price/2))+'). Los datos para transferirla van en el mensaje que se arma al pedir el turno.':'No hace falta seña. Te aviso qué sesión de tu cuponera es.')+'</p>'+
-  '<label class="field">Nombre<input id="f-name" data-g="f" data-k="name" autocomplete="name" value="'+esc(f.name)+'"></label>'+
+  '<label class="field">Nombre y apellido<input id="f-name" data-g="f" data-k="name" autocomplete="name" value="'+esc(f.name)+'"></label>'+
   '<label class="field">WhatsApp<input id="f-phone" data-g="f" data-k="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="'+esc(f.phone)+'"></label>'+
   '<div class="field">¿Es tu primera vez en Hábita?<div class="seg"><button class="opt" type="button" data-a="first" data-v="si" aria-pressed="'+(f.first==='si')+'">Sí</button><button class="opt" type="button" data-a="first" data-v="no" aria-pressed="'+(f.first==='no')+'">Ya vine antes</button></div></div>'+
   (f.first==='si'?'<label class="field">Lesiones, alergias o condiciones médicas que deba saber (opcional)<input id="f-health" data-g="f" data-k="health" value="'+esc(f.health)+'"></label>':'')+
   (S.svc==='emb'?'<label class="field">Semanas de embarazo (opcional)<input id="f-weeks" data-g="f" data-k="weeks" inputmode="numeric" value="'+esc(f.weeks)+'"></label>':'')+
   '<label class="field">Algo que quieras contarme, o otro horario que te sirva (opcional)<input id="f-note" data-g="f" data-k="note" value="'+esc(f.note)+'"></label>'+
-  '<a class="btn" id="cta" href="'+esc(c.href)+'" target="_blank" rel="noopener" data-a="sent" aria-disabled="'+(c.ok?'false':'true')+'">Pedir turno por WhatsApp</a>'+
+  '<p class="small" id="nmhint" style="margin:0"'+(f.name.trim()&&f.name.trim().split(/\s+/).length<2?'':' hidden')+'>Escribí tu nombre y apellido.</p>'+'<a class="btn" id="cta" href="'+esc(c.href)+'" target="_blank" rel="noopener" data-a="sent" aria-disabled="'+(c.ok?'false':'true')+'">Pedir turno por WhatsApp</a>'+
   '<p class="small" style="margin:0;text-align:center">Se abre WhatsApp con el pedido ya escrito.</p></section>';
 }
 function cancelState(){
@@ -272,14 +272,14 @@ function cancelState(){
     else if(hrs>=24){msg='Cancelás con más de 24 horas de anticipación: sin costo.';ok=true}
     else{msg='Faltan menos de 24 horas: según la política, se cobra la sesión.';ok=true}
   }
-  ok=ok&&c.name.trim().length>1;
+  ok=ok&&c.name.trim().split(/\s+/).length>=2;
   const text='Hola! Quiero cancelar mi turno de Hábita del '+(c.d?fmtDay(c.d):'')+' a las '+c.t+'. Soy '+c.name.trim()+'.';
   return{msg,ok,href:ok?wa(WA,text):'#'};
 }
 function cancelBox(){
   const c=S.cancel,st=cancelState();
   return '<details class="cancel" id="cdet"'+(S.cancelOpen?' open':'')+'><summary>¿Necesitás cancelar un turno?</summary><div class="in">'+
-  '<label class="field">Nombre<input id="c-name" data-g="c" data-k="name" autocomplete="name" value="'+esc(c.name)+'"></label>'+
+  '<label class="field">Nombre y apellido<input id="c-name" data-g="c" data-k="name" autocomplete="name" value="'+esc(c.name)+'"></label>'+
   '<div class="formgrid"><label class="field">Día del turno<input id="c-d" data-g="c" data-k="d" type="date" min="'+ymd(new Date())+'" value="'+esc(c.d)+'"></label>'+
   '<label class="field">Hora<select id="c-t" data-g="c" data-k="t">'+TIMES_X.map(h=>'<option'+(h===c.t?' selected':'')+'>'+h+'</option>').join('')+'</select></label></div>'+
   '<p class="note" id="cmsg"'+(st.msg?'':' hidden')+'>'+esc(st.msg)+'</p>'+
@@ -302,7 +302,7 @@ function render(keep){
   app.innerHTML=view();
   if(keep)window.scrollTo(0,y);
 }
-function updCta(){const c=ctaState(),a=$('#cta');if(a){a.href=c.href;a.setAttribute('aria-disabled',c.ok?'false':'true')}}
+function updCta(){const c=ctaState(),a=$('#cta');const h=$('#nmhint');if(h)h.hidden=S.form.name.trim().split(/\s+/).length>=2||!S.form.name.trim();if(a){a.href=c.href;a.setAttribute('aria-disabled',c.ok?'false':'true')}}
 function updCancel(){const st=cancelState(),m=$('#cmsg'),a=$('#ccta');if(m){m.hidden=!st.msg;m.textContent=st.msg}if(a){a.href=st.href;a.setAttribute('aria-disabled',st.ok?'false':'true')}}
 const G={f:S.form,c:S.cancel};
 function onField(e){
