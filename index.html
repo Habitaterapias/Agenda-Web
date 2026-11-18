@@ -186,13 +186,18 @@ const S={svc:null,day:null,time:null,month:new Date(today0().getFullYear(),today
   form:{name:'',phone:'',kind:'suelta',note:'',weeks:'',first:'',health:''},sent:false,
   cancel:{name:'',d:'',t:'10:00'},cancelOpen:false};
 function rule(d){const w=d.getDay();if(w===0||w===6)return null;return{first:8*60,close:19*60}}
+let HOR={taken:[],blocks:[],updated:null};
+const toMin=t=>{const x=t.split(':');return +x[0]*60+ +x[1]};
 function slotsFor(k,du){
   const d=parseD(k),r=rule(d);if(!r)return[];
   const now=new Date(),out=[];
+  const occ=[];
+  (HOR.taken||[]).forEach(o=>{if(o.d===k){const a=toMin(o.t);occ.push([a,a+(o.u||60)])}});
+  (HOR.blocks||[]).forEach(o=>{if(o.d===k){occ.push([o.from?toMin(o.from):0,o.to?toMin(o.to):1440])}});
   for(let s=r.first;s+du<=r.close;s+=30){
     const st=new Date(d.getFullYear(),d.getMonth(),d.getDate(),Math.floor(s/60),s%60);
     if(st<=now)continue;
-    out.push(hhmm(s));
+    out.push({h:hhmm(s),busy:occ.some(o=>s<o[1]&&s+du>o[0])});
   }
   return out;
 }
@@ -201,6 +206,7 @@ function dayOpen(k){
   if(!rule(d)||d<t0||d>addDays(t0,90))return false;
   return slotsFor(k,curDur()).length>0;
 }
+function dayFull(k){const l=slotsFor(k,curDur());return l.length>0&&l.every(x=>x.busy)}
 
 function stepServicio(){
   return '<section class="step" id="s1" data-done="'+(S.svc?1:0)+'"><div class="sh"><span class="num">1</span><h2>¿Qué servicio querés agendar?</h2></div><p class="hint">Tocá el que quieras.</p><div class="svc">'+
@@ -214,7 +220,7 @@ function stepDia(){
   for(let i=0;i<lead;i++)cells+='<span></span>';
   for(let d=1;d<=dim;d++){
     const k=ymd(new Date(m.getFullYear(),m.getMonth(),d));
-    cells+='<button class="day" type="button" data-a="day" data-v="'+k+'"'+(dayOpen(k)?'':' disabled')+' aria-pressed="'+(S.day===k)+'"'+(ymd(t0)===k?' data-today="1"':'')+'>'+d+'</button>';
+    cells+='<button class="day" type="button" data-a="day" data-v="'+k+'"'+(dayOpen(k)?'':' disabled')+(dayOpen(k)&&dayFull(k)?' data-full="1"':'')+' aria-pressed="'+(S.day===k)+'"'+(ymd(t0)===k?' data-today="1"':'')+'>'+d+'</button>';
   }
   const prevOk=m>new Date(t0.getFullYear(),t0.getMonth(),1);
   const nextOk=new Date(m.getFullYear(),m.getMonth()+1,1)<=maxD;
@@ -222,8 +228,8 @@ function stepDia(){
   if(S.day){
     const hs=slotsFor(S.day,curDur());
     slots='<div id="slots" style="scroll-margin-top:12px"><p class="dayh">'+esc(fmtDay(S.day))+'</p>'+
-      (hs.length?'<div class="slots">'+hs.map(h=>'<button class="slot" type="button" data-a="time" data-v="'+h+'" aria-pressed="'+(S.time===h)+'">'+h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
-      '<p class="legend">Elegí el horario que más te guste. Yo te confirmo la disponibilidad por WhatsApp.</p></div>';
+      (hs.length?'<div class="slots">'+hs.map(x=>x.busy?'<button class="slot busy" type="button" disabled aria-label="'+x.h+' ocupado"><s>'+x.h+'</s><span>Ocupado</span></button>':'<button class="slot" type="button" data-a="time" data-v="'+x.h+'" aria-pressed="'+(S.time===x.h)+'">'+x.h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
+      '<p class="legend">Los horarios tachados están ocupados. Elegí el que más te guste; yo te confirmo por WhatsApp.'+(HOR.updated?' Horarios actualizados: '+new Date(HOR.updated).toLocaleString('es-UY',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})+'.':'')+'</p></div>';
   }
   return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>¿Qué día y a qué hora?</h2></div><p class="hint">Tocá un día y después un horario.</p>'+
   '<div class="cal"><div class="calh"><button class="iconb" type="button" data-a="mon" data-v="-1" aria-label="Mes anterior"'+(prevOk?'':' disabled')+'>‹</button><strong>'+MONTHS[m.getMonth()]+' '+m.getFullYear()+'</strong><button class="iconb" type="button" data-a="mon" data-v="1" aria-label="Mes siguiente"'+(nextOk?'':' disabled')+'>›</button></div>'+
@@ -321,7 +327,7 @@ app.addEventListener('click',e=>{
   if(a==='svc'){
     S.svc=v;
     if(S.day&&!dayOpen(S.day)){S.day=null;S.time=null}
-    else if(S.time&&slotsFor(S.day,curDur()).indexOf(S.time)<0)S.time=null;
+    else if(S.time&&!slotsFor(S.day,curDur()).some(x=>x.h===S.time&&!x.busy))S.time=null;
     S.sent=false;render(true);
     const s2=$('#s2');if(s2&&s2.scrollIntoView)s2.scrollIntoView({behavior:'smooth',block:'start'});
   }else if(a==='mon'){S.month=new Date(S.month.getFullYear(),S.month.getMonth()+Number(v),1);render(true)}
@@ -333,6 +339,7 @@ app.addEventListener('click',e=>{
   else if(a==='reset'){S.svc=null;S.day=null;S.time=null;S.sent=false;S.form.note='';S.form.health='';S.form.weeks='';render();window.scrollTo(0,0)}
 });
 render();
+fetch('horarios.json?'+Date.now()).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.taken){HOR=j;render(true)}}).catch(()=>{});
 
 })();
 </script>
