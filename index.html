@@ -220,7 +220,7 @@ function stepDia(){
   for(let i=0;i<lead;i++)cells+='<span></span>';
   for(let d=1;d<=dim;d++){
     const k=ymd(new Date(m.getFullYear(),m.getMonth(),d));
-    cells+='<button class="day" type="button" data-a="day" data-v="'+k+'"'+(dayOpen(k)?'':' disabled')+(dayOpen(k)&&dayFull(k)?' data-full="1"':'')+' aria-pressed="'+(S.day===k)+'"'+(ymd(t0)===k?' data-today="1"':'')+'>'+d+'</button>';
+    cells+='<button class="day" type="button" data-a="day" data-v="'+k+'"'+(dayOpen(k)?'':' disabled')+' aria-pressed="'+(S.day===k)+'"'+(ymd(t0)===k?' data-today="1"':'')+'>'+d+'</button>';
   }
   const prevOk=m>new Date(t0.getFullYear(),t0.getMonth(),1);
   const nextOk=new Date(m.getFullYear(),m.getMonth()+1,1)<=maxD;
@@ -229,6 +229,7 @@ function stepDia(){
     const hs=slotsFor(S.day,curDur());
     slots='<div id="slots" style="scroll-margin-top:12px"><p class="dayh">'+esc(fmtDay(S.day))+'</p>'+
       (hs.length?'<div class="slots">'+hs.map(x=>x.busy?'<button class="slot busy" type="button" disabled aria-label="'+x.h+' ocupado"><s>'+x.h+'</s><span>Ocupado</span></button>':'<button class="slot" type="button" data-a="time" data-v="'+x.h+'" aria-pressed="'+(S.time===x.h)+'">'+x.h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
+      (dayFull(S.day)?'<p class="note">Ese día está completo. Si querés, te anoto en la lista de espera y te aviso si se libera un lugar.</p><a class="btn ghost" style="display:flex;margin:8px 0" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent('Hola! Quiero anotarme en la lista de espera para '+svcName(S.svc)+' el '+fmtDay(S.day)+'. Si se libera un lugar, avisame por favor.')+'">Anotarme en lista de espera</a>':'')+
       '<p class="legend">Los horarios tachados están ocupados. Elegí el que más te guste; yo te confirmo por WhatsApp.'+(HOR.updated?' Horarios actualizados: '+new Date(HOR.updated).toLocaleString('es-UY',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})+'.':'')+'</p></div>';
   }
   return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>¿Qué día y a qué hora?</h2></div><p class="hint">Tocá un día y después un horario.</p>'+
