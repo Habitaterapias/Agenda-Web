@@ -204,6 +204,7 @@ function slotsFor(k,du){
 function dayOpen(k){
   const d=parseD(k),t0=today0();
   if(!rule(d)||d<t0||d>addDays(t0,90))return false;
+  if(HOR.until&&k>HOR.until)return false;
   return slotsFor(k,curDur()).length>0;
 }
 function dayFull(k){const l=slotsFor(k,curDur());return l.length>0&&l.every(x=>x.busy)}
@@ -234,7 +235,7 @@ function stepDia(){
   }
   return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>¿Qué día y a qué hora?</h2></div><p class="hint">Tocá un día y después un horario.</p>'+
   '<div class="cal"><div class="calh"><button class="iconb" type="button" data-a="mon" data-v="-1" aria-label="Mes anterior"'+(prevOk?'':' disabled')+'>‹</button><strong>'+MONTHS[m.getMonth()]+' '+m.getFullYear()+'</strong><button class="iconb" type="button" data-a="mon" data-v="1" aria-label="Mes siguiente"'+(nextOk?'':' disabled')+'>›</button></div>'+
-  '<div class="grid7">'+['L','M','M','J','V','S','D'].map(x=>'<span class="wd">'+x+'</span>').join('')+cells+'</div></div>'+slots+'</section>';
+  '<div class="grid7">'+['L','M','M','J','V','S','D'].map(x=>'<span class="wd">'+x+'</span>').join('')+cells+'</div>'+(HOR.until?'<p class="legend">Agenda abierta hasta el '+esc(fmtDay(HOR.until))+'. Más adelante voy abriendo nuevas fechas.</p>':'')+'</div>'+slots+'</section>';
 }
 function reqMsg(){
   const f=S.form;
