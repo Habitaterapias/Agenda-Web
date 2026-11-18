@@ -124,7 +124,7 @@ details.cancel .in{display:flex;flex-direction:column;gap:12px;padding:4px 0 16p
 .opt .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
 .opt .desc{font-size:13px;line-height:1.45;color:var(--muted)}
 .day[data-full="1"]{text-decoration:line-through;opacity:.62}
-.legend{font-size:13px;color:var(--muted);margin:8px 2px 0}
+.wlcard{margin:12px 0 0;padding:14px;border:1px solid var(--terra);border-radius:14px;background:var(--soft)}.wlcard p{margin:4px 0 12px;font-size:14px}.legend{font-size:13px;color:var(--muted);margin:8px 2px 0}
 .badge{display:inline-block;min-width:18px;height:18px;border-radius:9px;background:var(--terra);color:var(--terra-ink);font-size:11px;line-height:18px;padding:0 5px;margin-left:4px;font-weight:600}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90vw;text-align:center}
 #toast.show{opacity:1}
@@ -182,7 +182,7 @@ const lotus=()=>'<svg viewBox="350 170 480 365" role="img" aria-label="Flor de l
 
 const WA='59894757659';
 const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
-const S={svc:null,day:null,time:null,month:new Date(today0().getFullYear(),today0().getMonth(),1),
+const S={busy:null,svc:null,day:null,time:null,month:new Date(today0().getFullYear(),today0().getMonth(),1),
   form:{name:'',phone:'',kind:'suelta',note:'',weeks:'',first:'',health:''},sent:false,
   cancel:{name:'',d:'',t:'10:00'},cancelOpen:false};
 function rule(d){const w=d.getDay();if(w===0||w===6)return null;return{first:8*60,close:19*60}}
@@ -228,8 +228,8 @@ function stepDia(){
   if(S.day){
     const hs=slotsFor(S.day,curDur());
     slots='<div id="slots" style="scroll-margin-top:12px"><p class="dayh">'+esc(fmtDay(S.day))+'</p>'+
-      (hs.length?'<div class="slots">'+hs.map(x=>x.busy?'<button class="slot busy" type="button" disabled aria-label="'+x.h+' ocupado"><s>'+x.h+'</s><span>Ocupado</span></button>':'<button class="slot" type="button" data-a="time" data-v="'+x.h+'" aria-pressed="'+(S.time===x.h)+'">'+x.h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
-      (dayFull(S.day)?'<p class="note">Ese día está completo. Si querés, te anoto en la lista de espera y te aviso si se libera un lugar.</p><a class="btn ghost" style="display:flex;margin:8px 0" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent('Hola! Quiero anotarme en la lista de espera para '+svcName(S.svc)+' el '+fmtDay(S.day)+'. Si se libera un lugar, avisame por favor.')+'">Anotarme en lista de espera</a>':'')+
+      (hs.length?'<div class="slots">'+hs.map(x=>x.busy?'<button class="slot busy" type="button" data-a="busy" data-v="'+x.h+'" aria-pressed="'+(S.busy===x.h)+'" aria-label="'+x.h+' ocupado"><s>'+x.h+'</s><span>Ocupado</span></button>':'<button class="slot" type="button" data-a="time" data-v="'+x.h+'" aria-pressed="'+(S.time===x.h)+'">'+x.h+'</button>').join('')+'</div>':'<p class="note">No quedan horarios ese día. Probá con otro.</p>')+
+      (S.busy?'<div class="wlcard" role="status"><strong>Ese horario ('+S.busy+') está ocupado.</strong><p>¿Lo necesitás? Te anoto en la lista de espera y te aviso si se libera.</p><a class="btn" style="display:flex" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent('Hola! Quiero anotarme en la lista de espera para '+svcName(S.svc)+' el '+fmtDay(S.day)+' a las '+S.busy+'. Si se libera, avisame por favor.')+'">Anotarme en lista de espera</a></div>':'')+
       '<p class="legend">Los horarios tachados están ocupados. Elegí el que más te guste; yo te confirmo por WhatsApp.'+(HOR.updated?' Horarios actualizados: '+new Date(HOR.updated).toLocaleString('es-UY',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})+'.':'')+'</p></div>';
   }
   return '<section class="step" id="s2" data-locked="'+(S.svc?0:1)+'" data-done="'+(S.time?1:0)+'"><div class="sh"><span class="num">2</span><h2>¿Qué día y a qué hora?</h2></div><p class="hint">Tocá un día y después un horario.</p>'+
@@ -326,14 +326,15 @@ app.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;
   const a=b.getAttribute('data-a'),v=b.getAttribute('data-v');
   if(a==='svc'){
-    S.svc=v;
+    S.svc=v;S.busy=null;
     if(S.day&&!dayOpen(S.day)){S.day=null;S.time=null}
     else if(S.time&&!slotsFor(S.day,curDur()).some(x=>x.h===S.time&&!x.busy))S.time=null;
     S.sent=false;render(true);
     const s2=$('#s2');if(s2&&s2.scrollIntoView)s2.scrollIntoView({behavior:'smooth',block:'start'});
   }else if(a==='mon'){S.month=new Date(S.month.getFullYear(),S.month.getMonth()+Number(v),1);render(true)}
-  else if(a==='day'){S.day=v;S.time=null;S.sent=false;render(true);const sl=$('#slots');if(sl&&sl.scrollIntoView)sl.scrollIntoView({behavior:'smooth',block:'nearest'})}
-  else if(a==='time'){S.time=v;S.sent=false;render(true);const s3=$('#s3');if(s3&&s3.scrollIntoView)s3.scrollIntoView({behavior:'smooth',block:'start'})}
+  else if(a==='day'){S.day=v;S.time=null;S.busy=null;S.sent=false;render(true);const sl=$('#slots');if(sl&&sl.scrollIntoView)sl.scrollIntoView({behavior:'smooth',block:'nearest'})}
+  else if(a==='busy'){S.busy=S.busy===v?null:v;S.time=null;S.sent=false;render(true)}
+  else if(a==='time'){S.time=v;S.busy=null;S.sent=false;render(true);const s3=$('#s3');if(s3&&s3.scrollIntoView)s3.scrollIntoView({behavior:'smooth',block:'start'})}
   else if(a==='kind'){S.form.kind=v;render(true)}
   else if(a==='first'){S.form.first=v;render(true)}
   else if(a==='sent'){if(b.getAttribute('aria-disabled')==='true'){e.preventDefault();return}setTimeout(()=>{S.sent=true;render(true)},400)}
