@@ -152,7 +152,7 @@ const PACKS=[
 ];
 const IG='https://www.instagram.com/habita_terapias';
 const money=n=>'$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-const durTxt=m=>m===60?'1 hora':m===90?'1 hora 30':m+' min';
+const durTxt=m=>m===60?'50 minutos':m===90?'1 hora 30':m+' min';
 const svcOf=id=>SERVICES.find(s=>s.id===id)||{dur:60,price:1000,name:''};
 const dur=id=>svcOf(id).dur;
 const curDur=()=>S.svc?dur(S.svc):60;
